@@ -29,7 +29,8 @@ async def handle_force_sub(client, message: Message):
     if not not_joined:
         return False
 
-    for ch in not_joined:
+    # Add buttons for ALL force subscription channels (both joined and not joined)
+    for ch in Config.FORCE_SUB_CHANNEL:
         info = client.channel_info.get(ch)
         if not info:
             continue
@@ -39,7 +40,11 @@ async def handle_force_sub(client, message: Message):
             continue
         # Ensure URL is valid
         if url.startswith(('http://', 'https://', 't.me/')):
-            buttons.append([InlineKeyboardButton(f"📢 {title}", url=url)])
+            # Show different emoji based on join status
+            if ch in joined:
+                buttons.append([InlineKeyboardButton(f"✅ {title}", url=url)])
+            else:
+                buttons.append([InlineKeyboardButton(f"📢 Join {title}", url=url)])
 
     # Retry button if start payload present
     if len(message.command) > 1:
@@ -69,8 +74,15 @@ async def handle_force_sub(client, message: Message):
     # Only add reply markup if buttons exist
     reply_markup = InlineKeyboardMarkup(buttons) if buttons else None
     
+    # Enhanced message with clear instructions
+    final_message = f"{fsub_msg}\n\n<b>📋 Channel Join Status:</b>\n{joined_txt}\n"
+    if not_joined:
+        final_message += f"\n🔽 <b>Click the buttons below to join the required channels:</b>"
+    else:
+        final_message += f"\n✅ <b>All channels joined! You can now use the bot.</b>"
+    
     await message.reply(
-        f"{fsub_msg}\n\n<b>Channel Join Status:</b>\n{joined_txt}",
+        final_message,
         reply_markup=reply_markup,
         disable_web_page_preview=True
     )
