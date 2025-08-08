@@ -1,7 +1,7 @@
 from pyrogram import Client, filters
 from pyrogram.types import Message, InlineKeyboardButton, InlineKeyboardMarkup, CallbackQuery, ReplyKeyboardMarkup, KeyboardButton
 from bot.database import get_random_files, get_popular_files, get_recent_files, get_index_stats, increment_access_count, is_premium_user
-from bot.utils import encode, get_readable_file_size
+from bot.utils import encode, get_readable_file_size, handle_force_sub
 from bot.utils.command_verification import check_command_limit, use_command
 # Rate limiter removed
 from info import Config
@@ -11,30 +11,35 @@ import traceback
 @Client.on_message(filters.command("rand") & filters.private)
 async def random_command(client: Client, message: Message):
     """Handle random command to show 5 random files"""
-    user_id = message.from_user.id
-
-    # Check command limit and use command if allowed
-    if not await use_command(user_id):
-        needs_verification, remaining = await check_command_limit(user_id)
-
-        # Create verification button
-        buttons = InlineKeyboardMarkup([
-            [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
-            [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")]
-        ])
-
-        await message.reply_text(
-            f"⚠️ **Command Limit Reached!**\n\n"
-            f"You've used all your free commands (3/3).\n\n"
-            f"🔓 **Get instant access by:**\n"
-            f"• Getting a verification token (with ads)\n"
-            f"• Upgrading to Premium (no ads)\n\n"
-            f"💡 Premium users get unlimited access without verification!",
-            reply_markup=buttons
-        )
-        return
     try:
         print(f"DEBUG: /rand command received from user {message.from_user.id}")
+
+        # Check force subscription first
+        if await handle_force_sub(client, message):
+            return
+
+        user_id = message.from_user.id
+
+        # Check command limit and use command if allowed
+        if not await use_command(user_id):
+            needs_verification, remaining = await check_command_limit(user_id)
+
+            # Create verification button
+            buttons = InlineKeyboardMarkup([
+                [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
+                [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")]
+            ])
+
+            await message.reply_text(
+                f"⚠️ **Command Limit Reached!**\n\n"
+                f"You've used all your free commands (3/3).\n\n"
+                f"🔓 **Get instant access by:**\n"
+                f"• Getting a verification token (with ads)\n"
+                f"• Upgrading to Premium (no ads)\n\n"
+                f"💡 Premium users get unlimited access without verification!",
+                reply_markup=buttons
+            )
+            return
         await handle_random_files(client, message)
     except Exception as cmd_error:
         print(f"ERROR: /rand command failed: {cmd_error}")
@@ -48,6 +53,10 @@ async def keyboard_random_handler(client: Client, message: Message):
     """Handle Random button press from custom keyboard"""
     try:
         print(f"DEBUG: Keyboard random handler triggered by user {message.from_user.id}")
+
+        # Check force subscription first
+        if await handle_force_sub(client, message):
+            return
 
         user_id = message.from_user.id
 
@@ -103,6 +112,10 @@ async def keyboard_recent_handler(client: Client, message: Message):
     try:
         print(f"DEBUG: Keyboard recent handler triggered by user {message.from_user.id}")
 
+        # Check force subscription first
+        if await handle_force_sub(client, message):
+            return
+
         user_id = message.from_user.id
 
         # Check command limit first
@@ -156,6 +169,10 @@ async def keyboard_popular_handler(client: Client, message: Message):
     """Handle Most Popular button press from custom keyboard"""
     try:
         print(f"DEBUG: Keyboard popular handler triggered by user {message.from_user.id}")
+
+        # Check force subscription first
+        if await handle_force_sub(client, message):
+            return
 
         user_id = message.from_user.id
 
@@ -223,6 +240,10 @@ async def keyboard_popular_handler(client: Client, message: Message):
 async def keyboard_premium_handler(client: Client, message: Message):
     """Handle Buy Premium button press from custom keyboard"""
     try:
+        # Check force subscription first
+        if await handle_force_sub(client, message):
+            return
+
         user_id = message.from_user.id
 
         # Check if user is already premium
@@ -268,6 +289,10 @@ async def random_callback(client: Client, callback_query: CallbackQuery):
     """Handle random-related callbacks"""
     try:
         print(f"DEBUG: Random callback received: {callback_query.data} from user {callback_query.from_user.id}")
+
+        # Check force subscription first
+        if await handle_force_sub(client, callback_query.message):
+            return
 
         data = callback_query.data.split("_", 1)
 
@@ -1238,55 +1263,72 @@ async def handle_popular_files(client: Client, message: Message, is_callback: bo
 @Client.on_message(filters.command("popular") & filters.private)
 async def popular_files_command(client: Client, message: Message):
     """Command to get popular files directly"""
-    user_id = message.from_user.id
+    try:
+        # Check force subscription first
+        if await handle_force_sub(client, message):
+            return
 
-    # Check command limit and use command if allowed
-    if not await use_command(user_id):
-        needs_verification, remaining = await check_command_limit(user_id)
+        user_id = message.from_user.id
 
-        # Create verification button
-        buttons = InlineKeyboardMarkup([
-            [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
-            [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")]
-        ])
+        # Check command limit and use command if allowed
+        if not await use_command(user_id):
+            needs_verification, remaining = await check_command_limit(user_id)
 
-        await message.reply_text(
-            f"⚠️ **Command Limit Reached!**\n\n"
-            f"You've used all your free commands (3/3).\n\n"
-            f"🔓 **Get instant access by:**\n"
-            f"• Getting a verification token (with ads)\n"
-            f"• Upgrading to Premium (no ads)\n\n"
-            f"💡 Premium users get unlimited access without verification!",
-            reply_markup=buttons
-        )
-        return
+            # Create verification button
+            buttons = InlineKeyboardMarkup([
+                [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
+                [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")]
+            ])
 
-    await handle_popular_files_direct(client, message, is_callback=False)
+            await message.reply_text(
+                f"⚠️ **Command Limit Reached!**\n\n"
+                f"You've used all your free commands (3/3).\n\n"
+                f"🔓 **Get instant access by:**\n"
+                f"• Getting a verification token (with ads)\n"
+                f"• Upgrading to Premium (no ads)\n\n"
+                f"💡 Premium users get unlimited access without verification!",
+                reply_markup=buttons
+            )
+            return
+
+        await handle_popular_files_direct(client, message, is_callback=False)
+    except Exception as e:
+        print(f"Error in popular_files_command: {e}")
+        await message.reply_text(f"❌ Error: {str(e)}")
+
 
 @Client.on_message(filters.command("recent") & filters.private)
 async def recent_files_command(client: Client, message: Message):
     """Command to get recent files directly"""
-    user_id = message.from_user.id
+    try:
+        # Check force subscription first
+        if await handle_force_sub(client, message):
+            return
 
-    # Check command limit and use command if allowed
-    if not await use_command(user_id):
-        needs_verification, remaining = await check_command_limit(user_id)
+        user_id = message.from_user.id
 
-        # Create verification button
-        buttons = InlineKeyboardMarkup([
-            [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
-            [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")]
-        ])
+        # Check command limit and use command if allowed
+        if not await use_command(user_id):
+            needs_verification, remaining = await check_command_limit(user_id)
 
-        await message.reply_text(
-            f"⚠️ **Command Limit Reached!**\n\n"
-            f"You've used all your free commands (3/3).\n\n"
-            f"🔓 **Get instant access by:**\n"
-            f"• Getting a verification token (with ads)\n"
-            f"• Upgrading to Premium (no ads)\n\n"
-            f"💡 Premium users get unlimited access without verification!",
-            reply_markup=buttons
-        )
-        return
+            # Create verification button
+            buttons = InlineKeyboardMarkup([
+                [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
+                [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")]
+            ])
 
-    await handle_recent_files_direct(client, message, is_callback=False)
+            await message.reply_text(
+                f"⚠️ **Command Limit Reached!**\n\n"
+                f"You've used all your free commands (3/3).\n\n"
+                f"🔓 **Get instant access by:**\n"
+                f"• Getting a verification token (with ads)\n"
+                f"• Upgrading to Premium (no ads)\n\n"
+                f"💡 Premium users get unlimited access without verification!",
+                reply_markup=buttons
+            )
+            return
+
+        await handle_recent_files_direct(client, message, is_callback=False)
+    except Exception as e:
+        print(f"Error in recent_files_command: {e}")
+        await message.reply_text(f"❌ Error: {str(e)}")

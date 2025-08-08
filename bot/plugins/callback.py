@@ -3,11 +3,10 @@
 from pyrogram import Client, filters
 from pyrogram.types import CallbackQuery, InlineKeyboardMarkup, InlineKeyboardButton
 from info import Config
-from pyrogram import __version__
-from bot.database import is_premium_user
+from bot.utils import get_messages, get_readable_time, schedule_manager, get_shortlink, handle_force_sub
+from bot.database import add_user, present_user, is_verified, validate_token_and_verify, is_premium_user, increment_access_count
 from bot.utils.command_verification import check_command_limit, use_command
 from bot.database.verify_db import create_verification_token
-from bot.utils.helper import get_shortlink
 import traceback
 
 @Client.on_callback_query(filters.regex("^about$"))
@@ -29,16 +28,21 @@ async def about_callback(client, query: CallbackQuery):
 async def my_stats_callback(client, query: CallbackQuery):
     """Handle My Stats button click"""
     try:
+        # Check force subscription first
+        if await handle_force_sub(client, query.message):
+            await query.answer()
+            return
+
         user_id = query.from_user.id
-        
+
         from bot.database import get_command_stats
         from bot.utils.command_verification import check_command_limit
-        
+
         stats = await get_command_stats(user_id)
         needs_verification, remaining = await check_command_limit(user_id)
-        
+
         status_text = "🔥 **Unlimited**" if remaining == -1 else f"🆓 **{remaining}/3**" if remaining > 0 else "❌ **Limit Reached**"
-        
+
         stats_text = f"""📊 **Your Command Usage Stats**
 
 👤 **User:** {query.from_user.first_name}
@@ -57,13 +61,18 @@ async def my_stats_callback(client, query: CallbackQuery):
                 [InlineKeyboardButton("🔒 Close", callback_data="close")]
             ])
         )
-        
+
     except Exception as e:
         print(f"ERROR in my_stats_callback: {e}")
         await query.answer("❌ Error retrieving stats. Please try again.", show_alert=True)
 
 @Client.on_callback_query(filters.regex("^get_token$"))
 async def get_token_callback(client, query):
+    # Check force subscription first
+    if await handle_force_sub(client, query.message):
+        await query.answer()
+        return
+
     user = query.from_user
 
     try:
@@ -131,6 +140,11 @@ async def execute_rand_callback(client, query: CallbackQuery):
     try:
         print(f"DEBUG: Execute rand callback triggered by user {query.from_user.id}")
 
+        # Check force subscription first
+        if await handle_force_sub(client, query.message):
+            await query.answer()
+            return
+
         user_id = query.from_user.id
 
         # First check if verification is needed
@@ -177,6 +191,11 @@ async def execute_rand_callback(client, query: CallbackQuery):
 
 @Client.on_callback_query(filters.regex("^show_premium_plans$"))
 async def show_premium_callback(client, query: CallbackQuery):
+    # Check force subscription first
+    if await handle_force_sub(client, query.message):
+        await query.answer()
+        return
+
     user_id = query.from_user.id
 
     # Check if user is already premium
@@ -194,14 +213,14 @@ async def show_premium_callback(client, query: CallbackQuery):
                 "description": "50 Command Tokens"
             },
             "standard": {
-                "name": "Standard Token Pack", 
+                "name": "Standard Token Pack",
                 "price": "79",
                 "tokens": 150,
                 "description": "150 Command Tokens"
             },
             "premium": {
                 "name": "Premium Token Pack",
-                "price": "149", 
+                "price": "149",
                 "tokens": 300,
                 "description": "300 Command Tokens"
             },
@@ -218,7 +237,7 @@ async def show_premium_callback(client, query: CallbackQuery):
         for plan_key, plan_info in PREMIUM_PLANS.items():
             buttons.append([
                 InlineKeyboardButton(
-                    f"💎 {plan_info['name']} - ₹{plan_info['price']}", 
+                    f"💎 {plan_info['name']} - ₹{plan_info['price']}",
                     callback_data=f"buy_premium:{plan_key}"
                 )
             ])
@@ -245,6 +264,11 @@ async def recent_files_callback(client, query: CallbackQuery):
     """Handle Recent Added button click - send recent files directly"""
     try:
         print(f"DEBUG: Recent files callback triggered by user {query.from_user.id}")
+
+        # Check force subscription first
+        if await handle_force_sub(client, query.message):
+            await query.answer()
+            return
 
         user_id = query.from_user.id
 
@@ -296,6 +320,11 @@ async def popular_files_callback(client, query: CallbackQuery):
     try:
         print(f"DEBUG: Popular files callback triggered by user {query.from_user.id}")
 
+        # Check force subscription first
+        if await handle_force_sub(client, query.message):
+            await query.answer()
+            return
+
         user_id = query.from_user.id
 
         # First check if verification is needed
@@ -346,6 +375,11 @@ async def new_random_callback(client, query: CallbackQuery):
     try:
         print(f"DEBUG: New random callback triggered by user {query.from_user.id}")
 
+        # Check force subscription first
+        if await handle_force_sub(client, query.message):
+            await query.answer()
+            return
+
         user_id = query.from_user.id
 
         # First check if verification is needed
@@ -393,9 +427,14 @@ async def new_random_callback(client, query: CallbackQuery):
 @Client.on_callback_query(filters.regex("^buy_premium:"))
 async def buy_premium_callback(client, query: CallbackQuery):
     """Handle premium purchase callbacks"""
+    # Check force subscription first
+    if await handle_force_sub(client, query.message):
+        await query.answer()
+        return
+
     try:
         plan_key = query.data.split(":")[1]
-        
+
         # Premium plan configurations
         PREMIUM_PLANS = {
             "basic": {"name": "Basic Token Pack", "price": "29", "tokens": 50},
@@ -403,7 +442,7 @@ async def buy_premium_callback(client, query: CallbackQuery):
             "premium": {"name": "Premium Token Pack", "price": "149", "tokens": 300},
             "unlimited": {"name": "Unlimited Access", "price": "299", "tokens": -1}
         }
-        
+
         plan = PREMIUM_PLANS.get(plan_key)
         if not plan:
             return await query.answer("❌ Invalid plan selected!", show_alert=True)

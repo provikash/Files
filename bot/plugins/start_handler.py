@@ -147,6 +147,7 @@ async def start_handler(client: Client, message: Message):
             )
     else:
         # Start Message / No Params
+        # Only show buttons if force subscription is not active
         buttons = InlineKeyboardMarkup([
             [
                 InlineKeyboardButton("🎲 Get Random Files", callback_data="execute_rand"),
