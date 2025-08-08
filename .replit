@@ -3,7 +3,7 @@ run = "python3 main.py"
 
 [nix]
 channel = "stable-25_05"
-packages = ["cacert", "libuv", "magma"]
+packages = ["cacert", "libuv", "magma", "gh"]
 
 [deployment]
 run = ["sh", "-c", "python3 main.py"]
