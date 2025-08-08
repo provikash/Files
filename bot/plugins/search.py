@@ -236,7 +236,53 @@ async def keyboard_popular_handler(client: Client, message: Message):
         print(f"Traceback: {traceback.format_exc()}")
         await message.reply_text("❌ An error occurred. Please try again.")
 
-@Client.on_message(filters.private & filters.text & filters.regex(r"^💎 Buy Premium$"))
+@Client.on_message(filters.private & filters.text & filters.regex(r"^🎲 Random Files$"))
+async def keyboard_random_handler_sync(client: Client, message: Message):
+    """Handle Random Files button press from custom keyboard - synchronized with inline button"""
+    try:
+        print(f"DEBUG: Keyboard Random Files handler triggered by user {message.from_user.id}")
+
+        # Check force subscription first
+        if await handle_force_sub(client, message):
+            return
+
+        user_id = message.from_user.id
+
+        # First check if verification is needed
+        needs_verification, remaining = await check_command_limit(user_id)
+
+        if needs_verification:
+            buttons = [
+                [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
+                [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")]
+            ]
+            await message.reply_text(
+                "🔐 **Verification Required!**\n\nYou need to verify your account to continue. Get a verification token to access 3 more commands!",
+                reply_markup=InlineKeyboardMarkup(buttons)
+            )
+            return
+
+        # Try to use command
+        if not await use_command(user_id):
+            buttons = [
+                [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
+                [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")]
+            ]
+            await message.reply_text(
+                "🔐 **Command Limit Reached!**\n\nYou've used all your free commands. Please verify to get 3 more commands or upgrade to Premium for unlimited access!",
+                reply_markup=InlineKeyboardMarkup(buttons)
+            )
+            return
+
+        # Execute random files function - same as callback
+        await handle_random_files(client, message, is_callback=False, skip_command_check=True)
+
+    except Exception as e:
+        print(f"ERROR in keyboard_random_handler_sync: {e}")
+        print(f"Traceback: {traceback.format_exc()}")
+        await message.reply_text("❌ An error occurred. Please try again.")
+
+@Client.on_message(filters.private & filters.text & filters.regex(r"^💎 Premium Plans$"))
 async def keyboard_premium_handler(client: Client, message: Message):
     """Handle Buy Premium button press from custom keyboard"""
     try:

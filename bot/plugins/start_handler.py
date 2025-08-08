@@ -150,11 +150,7 @@ async def start_handler(client: Client, message: Message):
         # Only show buttons if force subscription is not active
         buttons = InlineKeyboardMarkup([
             [
-                InlineKeyboardButton("🎲 Get Random Files", callback_data="execute_rand"),
-                InlineKeyboardButton("🆕 Recent Files", callback_data="rand_recent")
-            ],
-            [
-                InlineKeyboardButton("🔥 Popular Files", callback_data="rand_popular"),
+                InlineKeyboardButton("🎲 Random Files", callback_data="execute_rand"),
                 InlineKeyboardButton("💎 Premium Plans", callback_data="show_premium_plans")
             ],
             [
@@ -162,16 +158,23 @@ async def start_handler(client: Client, message: Message):
                 InlineKeyboardButton("🔒 Close", callback_data="close")
             ]
         ])
-        # Check remaining commands for non-premium users
+        # Check remaining commands and premium status
         from bot.utils.command_verification import check_command_limit
         needs_verification, remaining = await check_command_limit(user_id)
+        is_premium = await is_premium_user(user_id)
 
         command_status = ""
-        if remaining == -1:  # Unlimited (premium/admin)
-            command_status = "\n\n🔥 **Unlimited Access** - No command limits!"
-        elif remaining > 0:
+        if user_id in Config.ADMINS or user_id == Config.OWNER_ID:
+            command_status = "\n\n🔥 **Admin Access** - No command limits!"
+        elif is_premium and remaining == -1:  # Unlimited premium plan
+            command_status = "\n\n💎 **Premium Unlimited** - No command limits!"
+        elif is_premium and remaining > 0:  # Token-based premium plan
+            command_status = f"\n\n💎 **Premium Tokens:** {remaining} remaining"
+        elif is_premium and remaining == 0:  # Premium expired
+            command_status = "\n\n⚠️ **Premium Expired** - Verify to get 3 free commands!"
+        elif remaining > 0:  # Free user with commands left
             command_status = f"\n\n🆓 **Free Commands Remaining:** {remaining}/3"
-        else:
+        else:  # Free user limit reached
             command_status = "\n\n⚠️ **Command Limit Reached** - Verify to get 3 more free commands!"
 
         caption = Config.START_MSG + f"""
@@ -194,23 +197,19 @@ async def start_handler(client: Client, message: Message):
 
 # ──────────────────────────────────────────────────────────────
 
-@Client.on_message(filters.private & filters.text & ~filters.command(['start', 'token', 'rand', 'recent', 'popular']) & ~filters.regex(r"^(🎲 Random|🆕 Recent Added|🔥 Most Popular|💎 Buy Premium)$"))
+@Client.on_message(filters.private & filters.text & ~filters.command(['start', 'token', 'rand']) & ~filters.regex(r"^(🎲 Random Files|💎 Premium Plans)$"))
 async def handle_useless_messages(client: Client, message: Message):
-    """Handle any useless/random text messages with synchronized keyboards"""
+    """Handle any useless/random text messages with simplified synchronized keyboards"""
     user = message.from_user
 
     # Check force subscription first
     if await handle_force_sub(client, message):
         return
 
-    # Create synchronized custom keyboard that matches inline buttons
+    # Create simplified custom keyboard with only Random and Premium buttons
     custom_keyboard = ReplyKeyboardMarkup([
         [
             KeyboardButton("🎲 Random Files"),
-            KeyboardButton("🆕 Recent Files")
-        ],
-        [
-            KeyboardButton("🔥 Popular Files"),
             KeyboardButton("💎 Premium Plans")
         ]
     ], resize_keyboard=True, one_time_keyboard=False)
@@ -219,10 +218,6 @@ async def handle_useless_messages(client: Client, message: Message):
     inline_buttons = InlineKeyboardMarkup([
         [
             InlineKeyboardButton("🎲 Random Files", callback_data="execute_rand"),
-            InlineKeyboardButton("🆕 Recent Files", callback_data="rand_recent")
-        ],
-        [
-            InlineKeyboardButton("🔥 Popular Files", callback_data="rand_popular"),
             InlineKeyboardButton("💎 Premium Plans", callback_data="show_premium_plans")
         ],
         [
@@ -235,8 +230,6 @@ async def handle_useless_messages(client: Client, message: Message):
         f"👋 Hi {user.first_name}!\n\n"
         f"🤖 **Please use the buttons below to navigate:**\n\n"
         f"🎲 **Random Files** - Get 5 random media files instantly\n"
-        f"🆕 **Recent Files** - Latest uploaded files\n"
-        f"🔥 **Popular Files** - Most accessed files\n"
         f"💎 **Premium Plans** - Unlimited access without ads\n\n"
         f"💡 **Use either keyboard or inline buttons!**",
         reply_markup=custom_keyboard

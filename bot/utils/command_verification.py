@@ -13,13 +13,33 @@ async def check_command_limit(user_id: int) -> tuple[bool, int]:
     Check if user has exceeded command limit
     Returns: (needs_verification, remaining_commands)
     """
-    # Skip verification for admins, owner, and premium users
-    if (user_id in Config.ADMINS or
-        user_id == Config.OWNER_ID or
-        await is_premium_user(user_id)):
-        print(f"DEBUG: User {user_id} has unlimited access (admin/owner/premium)")
+    # Skip verification for admins and owner only
+    if user_id in Config.ADMINS or user_id == Config.OWNER_ID:
+        print(f"DEBUG: User {user_id} has unlimited access (admin/owner)")
         return False, -1  # -1 means unlimited
 
+    # Check if user is premium and get their token count
+    if await is_premium_user(user_id):
+        from bot.database.premium_db import get_premium_info
+        premium_info = await get_premium_info(user_id)
+        
+        if premium_info:
+            tokens_remaining = premium_info.get('tokens_remaining', 0)
+            
+            if tokens_remaining == -1:  # Unlimited plan
+                print(f"DEBUG: Premium user {user_id} has unlimited access")
+                return False, -1
+            elif tokens_remaining > 0:  # Token-based plan
+                print(f"DEBUG: Premium user {user_id} has {tokens_remaining} tokens remaining")
+                return False, tokens_remaining
+            else:  # No tokens left
+                print(f"DEBUG: Premium user {user_id} has no tokens left")
+                return True, 0
+        else:
+            print(f"DEBUG: Premium user {user_id} has no premium info - treating as expired")
+            return True, 0
+
+    # Handle regular free users
     command_count = await get_user_command_count(user_id)
     print(f"DEBUG: User {user_id} command count check: {command_count}/3")
 
@@ -46,19 +66,27 @@ async def use_command(user_id: int) -> bool:
     Thread-safe implementation to prevent race conditions.
     """
     try:
-        # Skip limits entirely for admins, owner, and premium users - no counting at all
-        if (user_id in Config.ADMINS or
-            user_id == Config.OWNER_ID or
-            await is_premium_user(user_id)):
-            print(f"DEBUG: User {user_id} has unlimited access (admin/owner/premium)")
+        # Skip limits entirely for admins and owner - no counting at all
+        if user_id in Config.ADMINS or user_id == Config.OWNER_ID:
+            print(f"DEBUG: User {user_id} has unlimited access (admin/owner)")
             return True
 
-        # Get or create user-specific lock for regular users only
+        # Get or create user-specific lock
         if user_id not in _user_locks:
             _user_locks[user_id] = asyncio.Lock()
 
         async with _user_locks[user_id]:
-            # Get current command count
+            # Check if user is premium and handle token deduction
+            if await is_premium_user(user_id):
+                from bot.database.premium_db import use_premium_token
+                if await use_premium_token(user_id):
+                    print(f"DEBUG: Premium user {user_id} used a token successfully")
+                    return True
+                else:
+                    print(f"DEBUG: Premium user {user_id} has no tokens left - premium expired")
+                    return False
+
+            # Handle regular users with free commands
             current_count = await get_user_command_count(user_id)
             print(f"DEBUG: User {user_id} current command count: {current_count}")
 
@@ -67,7 +95,7 @@ async def use_command(user_id: int) -> bool:
                 print(f"DEBUG: User {user_id} reached command limit")
                 return False
 
-            # Increment command count atomically for regular users only
+            # Increment command count atomically for regular users
             await increment_command_count(user_id)
             print(f"DEBUG: Incremented command count for user {user_id} to {current_count + 1}")
             return True

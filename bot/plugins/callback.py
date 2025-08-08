@@ -40,8 +40,21 @@ async def my_stats_callback(client, query: CallbackQuery):
 
         stats = await get_command_stats(user_id)
         needs_verification, remaining = await check_command_limit(user_id)
+        is_premium = await is_premium_user(user_id)
 
-        status_text = "🔥 **Unlimited**" if remaining == -1 else f"🆓 **{remaining}/3**" if remaining > 0 else "❌ **Limit Reached**"
+        # Determine status text based on user type
+        if user_id in Config.ADMINS or user_id == Config.OWNER_ID:
+            status_text = "🔥 **Admin - Unlimited**"
+        elif is_premium and remaining == -1:
+            status_text = "💎 **Premium - Unlimited**"
+        elif is_premium and remaining > 0:
+            status_text = f"💎 **Premium - {remaining} tokens**"
+        elif is_premium and remaining == 0:
+            status_text = "❌ **Premium Expired**"
+        elif remaining > 0:
+            status_text = f"🆓 **{remaining}/3 free commands**"
+        else:
+            status_text = "❌ **Limit Reached**"
 
         stats_text = f"""📊 **Your Command Usage Stats**
 
