@@ -56,7 +56,7 @@ class Config(object):
 
     # Force subscription
     FORCE_SUB_CHANNEL = list(set(int(ch) for ch in getenv("FORCE_SUB_CHANNEL", "").split() if id_pattern.fullmatch(ch)))
-    JOIN_REQUEST_ENABLE = getenv("JOIN_REQUEST_ENABLED", None)
+    JOIN_REQUEST_ENABLE = getenv("JOIN_REQUEST_ENABLED", "False").lower() in ("true", "1", "yes")
 
     # Messages - Load from environment
     START_PIC = getenv("START_PIC", "")

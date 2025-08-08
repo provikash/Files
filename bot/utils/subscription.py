@@ -25,6 +25,13 @@ async def handle_force_sub(client, message: Message):
                 ChatMemberStatus.MEMBER,
             ):
                 joined.append(ch)
+            elif member.status == ChatMemberStatus.RESTRICTED:
+                # Check if join requests are enabled and user has pending request
+                if Config.JOIN_REQUEST_ENABLE:
+                    # User is restricted but may have a pending join request
+                    not_joined.append(ch)
+                else:
+                    not_joined.append(ch)
             else:
                 not_joined.append(ch)
         except Exception:
