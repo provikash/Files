@@ -706,3 +706,8 @@ https://t.me/ps_updates
 [08-Aug-25 18:06:05 - INFO] - apscheduler.scheduler - Scheduler started
 [08-Aug-25 19:35:39 - INFO] - root - Stop signal received (SIGTERM). Exiting...
 [08-Aug-25 19:35:40 - INFO] - bot - Bot stopped.
+[08-Aug-25 19:36:25 - INFO] - bot - Bot Running..!
+
+Created by 
+https://t.me/ps_updates
+[08-Aug-25 19:36:25 - INFO] - apscheduler.scheduler - Scheduler started
