@@ -36,6 +36,7 @@ class Bot(Client):
         self.uptime = datetime.now()             
         self.channel_info = {}
         
+        # Load force subscription channel info
         for channel_id in Config.FORCE_SUB_CHANNEL:
             try:
                 chat = await self.get_chat(channel_id)
@@ -43,9 +44,23 @@ class Bot(Client):
                 link = chat.invite_link
         
                 if not link:
-                    await self.export_chat_invite_link(channel_id)
+                    link = await self.export_chat_invite_link(channel_id)
                     chat = await self.get_chat(channel_id)
-                    link = chat.invite_link
+                    link = chat.invite_link or link
+                
+                self.channel_info[channel_id] = {
+                    "title": title,
+                    "invite_link": link
+                }
+                print(f"✅ Loaded channel info: {title} - {link}")
+                
+            except Exception as e:
+                print(f"❌ Failed to load channel {channel_id}: {e}")
+                # Store minimal info for fallback
+                self.channel_info[channel_id] = {
+                    "title": f"Channel {channel_id}",
+                    "invite_link": f"https://t.me/c/{str(channel_id)[4:]}"
+                }t.invite_link
                 
                 self.channel_info[channel_id] = {"title": title, "link": link}
                 
