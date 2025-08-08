@@ -197,7 +197,11 @@ async def handle_useless_messages(client: Client, message: Message):
     """Handle any useless/random text messages with custom keyboard"""
     user = message.from_user
 
-    # Create custom keyboard with main options
+    # Check force subscription first
+    if await handle_force_sub(client, message):
+        return
+
+    # Create custom keyboard with main options (only after force sub verification)
     custom_keyboard = ReplyKeyboardMarkup([
         [
             KeyboardButton("🎲 Random"),

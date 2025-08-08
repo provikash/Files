@@ -35,9 +35,11 @@ async def handle_force_sub(client, message: Message):
             continue
         url = info.get("invite_link")
         title = info.get("title", "Channel")
-        if not url:
+        if not url or not url.strip():
             continue
-        buttons.append([InlineKeyboardButton(f"📢 {title}", url=url)])
+        # Ensure URL is valid
+        if url.startswith(('http://', 'https://', 't.me/')):
+            buttons.append([InlineKeyboardButton(f"📢 {title}", url=url)])
 
     # Retry button if start payload present
     if len(message.command) > 1:
@@ -64,9 +66,12 @@ async def handle_force_sub(client, message: Message):
         id=user.id
     )
     
+    # Only add reply markup if buttons exist
+    reply_markup = InlineKeyboardMarkup(buttons) if buttons else None
+    
     await message.reply(
         f"{fsub_msg}\n\n<b>Channel Join Status:</b>\n{joined_txt}",
-        reply_markup=InlineKeyboardMarkup(buttons),
+        reply_markup=reply_markup,
         disable_web_page_preview=True
     )
     return True
