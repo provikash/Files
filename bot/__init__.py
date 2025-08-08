@@ -60,9 +60,7 @@ class Bot(Client):
                 self.channel_info[channel_id] = {
                     "title": f"Channel {channel_id}",
                     "invite_link": f"https://t.me/c/{str(channel_id)[4:]}"
-                }t.invite_link
-                
-                self.channel_info[channel_id] = {"title": title, "link": link}
+                }
                 
             except Exception as e:
                 self.log(__name__).warning(f"Could not get info for channel {channel_id}: {e}")
