@@ -643,3 +643,24 @@ https://t.me/ps_updates
 Created by 
 https://t.me/ps_updates
 [08-Aug-25 16:48:42 - INFO] - apscheduler.scheduler - Scheduler started
+[08-Aug-25 16:57:34 - INFO] - root - Stop signal received (SIGTERM). Exiting...
+[08-Aug-25 16:57:34 - INFO] - bot - Bot stopped.
+[08-Aug-25 16:57:39 - INFO] - bot - Bot Running..!
+
+Created by 
+https://t.me/ps_updates
+[08-Aug-25 16:57:39 - INFO] - apscheduler.scheduler - Scheduler started
+[08-Aug-25 17:06:41 - INFO] - root - Stop signal received (SIGTERM). Exiting...
+[08-Aug-25 17:06:41 - INFO] - bot - Bot stopped.
+[08-Aug-25 17:08:51 - INFO] - bot - Bot Running..!
+
+Created by 
+https://t.me/ps_updates
+[08-Aug-25 17:08:51 - INFO] - apscheduler.scheduler - Scheduler started
+[08-Aug-25 17:10:39 - INFO] - root - Stop signal received (SIGTERM). Exiting...
+[08-Aug-25 17:10:39 - INFO] - bot - Bot stopped.
+[08-Aug-25 17:10:45 - INFO] - bot - Bot Running..!
+
+Created by 
+https://t.me/ps_updates
+[08-Aug-25 17:10:45 - INFO] - apscheduler.scheduler - Scheduler started
