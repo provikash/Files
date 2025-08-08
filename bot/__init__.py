@@ -45,7 +45,26 @@ class Bot(Client):
         
                 if not link:
                     link = await self.export_chat_invite_link(channel_id)
-                    chat = await self.get_chat(channel_id)
+                    
+                self.channel_info[channel_id] = {"title": title, "invite_link": link}
+                print(f"✅ Loaded force channel info: {title} - {link}")
+            except Exception as e:
+                print(f"❌ Error loading force channel {channel_id}: {e}")
+
+        # Load request channel info
+        request_channels = getattr(Config, 'REQUEST_CHANNEL', [])
+        for channel_id in request_channels:
+            try:
+                chat = await self.get_chat(channel_id)
+                title = chat.title
+                
+                self.channel_info[channel_id] = {"title": title, "invite_link": None}
+                print(f"✅ Loaded request channel info: {title}")
+            except Exception as e:
+                print(f"❌ Error loading request channel {channel_id}: {e}")
+
+        if True:  # Placeholder for the rest of the method
+            chat = await self.get_chat(channel_id)
                     link = chat.invite_link or link
                 
                 self.channel_info[channel_id] = {

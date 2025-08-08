@@ -54,8 +54,11 @@ class Config(object):
     DATABASE_URL = getenv("DATABASE_URL")
     DATABASE_NAME = getenv("DATABASE_NAME", "Cluster0")
 
-    # Force subscription
+    # Force subscription (normal invite links)
     FORCE_SUB_CHANNEL = list(set(int(ch) for ch in getenv("FORCE_SUB_CHANNEL", "").split() if id_pattern.fullmatch(ch)))
+    
+    # Request channels (admin approval required)
+    REQUEST_CHANNEL = list(set(int(ch) for ch in getenv("REQUEST_CHANNEL", "").split() if id_pattern.fullmatch(ch)))
     JOIN_REQUEST_ENABLE = getenv("JOIN_REQUEST_ENABLED", "False").lower() in ("true", "1", "yes")
 
     # Messages - Load from environment

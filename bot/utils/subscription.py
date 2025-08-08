@@ -1,3 +1,4 @@
+
 # Cleaned & Refactored by @Mak0912 (TG)
 
 from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
@@ -7,16 +8,36 @@ from info import Config
 
 async def handle_force_sub(client, message: Message):
     user = message.from_user
-    not_joined = []
+    not_joined_force = []
+    not_joined_request = []
     joined = []
     buttons = []
 
-    # Check if force subscription is enabled
-    if not Config.FORCE_SUB_CHANNEL:
+    # Check if any subscription channels are configured
+    force_channels = getattr(Config, 'FORCE_SUB_CHANNEL', [])
+    request_channels = getattr(Config, 'REQUEST_CHANNEL', [])
+    all_channels = force_channels + request_channels
+    
+    if not all_channels:
         return False
 
-    # Use preloaded channel info from client.channel_info
-    for ch in Config.FORCE_SUB_CHANNEL:
+    # Check force subscription channels (normal invite links)
+    for ch in force_channels:
+        try:
+            member = await client.get_chat_member(ch, user.id)
+            if member.status in (
+                ChatMemberStatus.OWNER,
+                ChatMemberStatus.ADMINISTRATOR,
+                ChatMemberStatus.MEMBER,
+            ):
+                joined.append(ch)
+            else:
+                not_joined_force.append(ch)
+        except Exception:
+            not_joined_force.append(ch)
+
+    # Check request channels (admin approval required)
+    for ch in request_channels:
         try:
             member = await client.get_chat_member(ch, user.id)
             if member.status in (
@@ -26,22 +47,19 @@ async def handle_force_sub(client, message: Message):
             ):
                 joined.append(ch)
             elif member.status == ChatMemberStatus.RESTRICTED:
-                # Check if join requests are enabled and user has pending request
-                if Config.JOIN_REQUEST_ENABLE:
-                    # User is restricted but may have a pending join request
-                    not_joined.append(ch)
-                else:
-                    not_joined.append(ch)
+                # User has pending join request
+                not_joined_request.append(ch)
             else:
-                not_joined.append(ch)
+                not_joined_request.append(ch)
         except Exception:
-            not_joined.append(ch)
+            not_joined_request.append(ch)
 
-    if not not_joined:
+    # If all channels are joined, return False (no force sub needed)
+    if not not_joined_force and not not_joined_request:
         return False
 
-    # Create buttons for ALL force subscription channels
-    for ch in Config.FORCE_SUB_CHANNEL:
+    # Create buttons for force subscription channels (normal invite)
+    for ch in force_channels:
         try:
             # Get channel info
             if hasattr(client, 'channel_info') and client.channel_info.get(ch):
@@ -57,8 +75,37 @@ async def handle_force_sub(client, message: Message):
             url = info.get("invite_link")
             title = info.get("title", f"Channel {ch}")
             
-            # Handle join request enabled channels
-            if Config.JOIN_REQUEST_ENABLE and ch in not_joined:
+            # If no invite link, create one (regular invite)
+            if not url:
+                try:
+                    url = await client.export_chat_invite_link(ch)
+                except:
+                    url = f"https://t.me/c/{str(ch)[4:]}"
+                    
+            # Ensure URL is valid and create button
+            if url and url.strip():
+                if ch in joined:
+                    buttons.append([InlineKeyboardButton(f"✅ {title}", url=url)])
+                else:
+                    buttons.append([InlineKeyboardButton(f"📢 Join {title}", url=url)])
+        except Exception as e:
+            print(f"Error creating button for force channel {ch}: {e}")
+            # Create a fallback button
+            buttons.append([InlineKeyboardButton(f"📢 Join Channel", url=f"https://t.me/c/{str(ch)[4:]}")])
+
+    # Create buttons for request channels (admin approval required)
+    for ch in request_channels:
+        try:
+            # Get channel info
+            try:
+                chat = await client.get_chat(ch)
+                title = chat.title or f"Channel {ch}"
+            except:
+                title = f"Channel {ch}"
+            
+            if ch in joined:
+                buttons.append([InlineKeyboardButton(f"✅ {title}", url=f"https://t.me/c/{str(ch)[4:]}")])
+            elif Config.JOIN_REQUEST_ENABLE:
                 try:
                     # Create an invite link that requires admin approval
                     invite_link = await client.create_chat_invite_link(
@@ -68,34 +115,24 @@ async def handle_force_sub(client, message: Message):
                     )
                     url = invite_link.invite_link
                     print(f"DEBUG: Created join request link for channel {ch}: {url}")
+                    buttons.append([InlineKeyboardButton(f"🔔 Request to Join {title}", url=url)])
                 except Exception as e:
                     print(f"DEBUG: Failed to create join request link for {ch}: {e}")
-                    # Fallback to regular invite link
-                    if not url:
-                        try:
-                            url = await client.export_chat_invite_link(ch)
-                        except:
-                            url = f"https://t.me/c/{str(ch)[4:]}"
-            else:
-                # If no invite link, create one (regular invite)
-                if not url:
+                    # Fallback to regular link
                     try:
                         url = await client.export_chat_invite_link(ch)
+                        buttons.append([InlineKeyboardButton(f"📢 Join {title}", url=url)])
                     except:
-                        url = f"https://t.me/c/{str(ch)[4:]}"
-                    
-            # Ensure URL is valid and create button
-            if url and url.strip():
-                if ch in joined:
-                    buttons.append([InlineKeyboardButton(f"✅ {title}", url=url)])
-                elif Config.JOIN_REQUEST_ENABLE and ch in not_joined:
-                    buttons.append([InlineKeyboardButton(f"🔔 Request to Join {title}", url=url)])
-                else:
+                        buttons.append([InlineKeyboardButton(f"📢 Join {title}", url=f"https://t.me/c/{str(ch)[4:]}")])
+            else:
+                # Regular invite link for request channels when JOIN_REQUEST_ENABLE is false
+                try:
+                    url = await client.export_chat_invite_link(ch)
                     buttons.append([InlineKeyboardButton(f"📢 Join {title}", url=url)])
+                except:
+                    buttons.append([InlineKeyboardButton(f"📢 Join {title}", url=f"https://t.me/c/{str(ch)[4:]}")])
         except Exception as e:
-            print(f"Error creating button for channel {ch}: {e}")
-            # Create a fallback button
-            buttons.append([InlineKeyboardButton(f"📢 Join Channel", url=f"https://t.me/c/{str(ch)[4:]}")])
+            print(f"Error creating button for request channel {ch}: {e}")
 
     # Add retry button if start payload is present
     if hasattr(message, 'command') and len(message.command) > 1:
@@ -107,7 +144,9 @@ async def handle_force_sub(client, message: Message):
 
     # Build channel join status text
     joined_txt = ""
-    for ch in Config.FORCE_SUB_CHANNEL:
+    
+    # Show force subscription channels
+    for ch in force_channels:
         try:
             if hasattr(client, 'channel_info') and client.channel_info.get(ch):
                 title = client.channel_info.get(ch).get("title", f"Channel {ch}")
@@ -118,9 +157,22 @@ async def handle_force_sub(client, message: Message):
             title = f"Channel {ch}"
             
         if ch in joined:
-            joined_txt += f"✅ <b>{title}</b>\n"
+            joined_txt += f"✅ <b>{title}</b> (Force Sub)\n"
         else:
-            joined_txt += f"❌ <b>{title}</b>\n"
+            joined_txt += f"❌ <b>{title}</b> (Force Sub)\n"
+    
+    # Show request channels
+    for ch in request_channels:
+        try:
+            chat = await client.get_chat(ch)
+            title = chat.title or f"Channel {ch}"
+        except:
+            title = f"Channel {ch}"
+            
+        if ch in joined:
+            joined_txt += f"✅ <b>{title}</b> (Request)\n"
+        else:
+            joined_txt += f"🔔 <b>{title}</b> (Request)\n"
 
     # Format the force subscription message
     fsub_msg = Config.FORCE_MSG.format(
@@ -133,22 +185,24 @@ async def handle_force_sub(client, message: Message):
     
     # Enhanced message with clear instructions
     final_message = f"{fsub_msg}\n\n<b>📋 Channel Join Status:</b>\n{joined_txt}\n"
-    if not_joined:
-        if Config.JOIN_REQUEST_ENABLE:
-            final_message += f"\n🔽 <b>Click the buttons below to request to join the required channels:</b>\n"
-            final_message += f"<i>⏳ Your request will be sent to admins for approval. You'll be able to use the bot once approved.</i>"
-        else:
-            final_message += f"\n🔽 <b>Click the buttons below to join the required channels:</b>"
+    
+    if not_joined_force or not_joined_request:
+        final_message += f"\n🔽 <b>Instructions:</b>\n"
+        if not_joined_force:
+            final_message += f"📢 <b>Force Sub:</b> Click to join directly\n"
+        if not_joined_request and Config.JOIN_REQUEST_ENABLE:
+            final_message += f"🔔 <b>Request:</b> Click to send join request (admin approval required)\n"
+            final_message += f"<i>⏳ Your request will be sent to admins for approval.</i>\n"
     else:
         final_message += f"\n✅ <b>All channels joined! You can now use the bot.</b>"
     
     # Ensure we have buttons before creating markup
     if buttons:
         reply_markup = InlineKeyboardMarkup(buttons)
-        print(f"DEBUG: Created {len(buttons)} buttons for force subscription")
+        print(f"DEBUG: Created {len(buttons)} buttons for subscription")
     else:
         reply_markup = None
-        print("DEBUG: No buttons created for force subscription")
+        print("DEBUG: No buttons created for subscription")
     
     try:
         await message.reply(
