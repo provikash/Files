@@ -29,10 +29,6 @@ class Config(object):
     if not API_ID or not API_HASH or not BOT_TOKEN:
         raise ValueError("Missing required environment variables: API_ID, API_HASH, or BOT_TOKEN")
     
-    # Validate API_ID is numeric before conversion
-    if not API_ID.isdigit():
-        raise ValueError(f"API_ID must be a valid number, got: {API_ID}")
-    
     # Convert API_ID to int after validation
     API_ID = int(API_ID)
 
