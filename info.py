@@ -87,12 +87,11 @@ class Config(object):
     TUTORIAL = getenv("TUTORIAL","https://t.me/alfhamovies/13")
 
     # Bot Messages - Load from environment
-BOT_STATS_TEXT = getenv("BOT_STATS_TEXT", "<b>BOT UPTIME</b>\n{uptime}")
-
-USER_REPLY_TEXT = getenv("USER_REPLY_TEXT", "❌ I'm a bot — please don't DM me!")
+    BOT_STATS_TEXT = getenv("BOT_STATS_TEXT", "<b>BOT UPTIME</b>\n{uptime}")
+    USER_REPLY_TEXT = getenv("USER_REPLY_TEXT", "❌ I'm a bot — please don't DM me!")
 
     # Premium Settings - Load from environment
-PREMIUM_ENABLED = getenv("PREMIUM_ENABLED", "True").lower() in ("true", "1", "yes")
-PAYMENT_UPI = getenv("PAYMENT_UPI", "your_actual_upi@paytm")
-PAYMENT_PHONE = getenv("PAYMENT_PHONE", "+911234567890")
-ADMIN_USERNAME = getenv("ADMIN_USERNAME", "termuxro")
+    PREMIUM_ENABLED = getenv("PREMIUM_ENABLED", "True").lower() in ("true", "1", "yes")
+    PAYMENT_UPI = getenv("PAYMENT_UPI", "your_actual_upi@paytm")
+    PAYMENT_PHONE = getenv("PAYMENT_PHONE", "+911234567890")
+    ADMIN_USERNAME = getenv("ADMIN_USERNAME", "termuxro")
