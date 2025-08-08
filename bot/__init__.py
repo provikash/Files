@@ -63,27 +63,7 @@ class Bot(Client):
             except Exception as e:
                 print(f"❌ Error loading request channel {channel_id}: {e}")
 
-        if True:  # Placeholder for the rest of the method
-            chat = await self.get_chat(channel_id)
-                    link = chat.invite_link or link
-                
-                self.channel_info[channel_id] = {
-                    "title": title,
-                    "invite_link": link
-                }
-                print(f"✅ Loaded channel info: {title} - {link}")
-                
-            except Exception as e:
-                print(f"❌ Failed to load channel {channel_id}: {e}")
-                # Store minimal info for fallback
-                self.channel_info[channel_id] = {
-                    "title": f"Channel {channel_id}",
-                    "invite_link": f"https://t.me/c/{str(channel_id)[4:]}"
-                }
-                
-            except Exception as e:
-                self.log(__name__).warning(f"Could not get info for channel {channel_id}: {e}")
-                continue
+        
         
         # Initialize database channel
         try:
