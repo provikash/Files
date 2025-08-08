@@ -356,12 +356,12 @@ async def popular_files_callback(client, query: CallbackQuery):
         # Acknowledge the callback first
         await query.answer("Getting popular files...", show_alert=False)
 
-        # Import and execute the popular files function
+        # Import and execute the popular files function (direct media sending)
         try:
-            from bot.plugins.search import show_popular_files
-            await show_popular_files(client, query)
+            from bot.plugins.search import handle_popular_files_direct
+            await handle_popular_files_direct(client, query.message, is_callback=True)
         except ImportError as e:
-            print(f"Import error for show_popular_files: {e}")
+            print(f"Import error for handle_popular_files_direct: {e}")
             await query.edit_message_text("❌ Popular files feature temporarily unavailable.")
 
     except Exception as e:
