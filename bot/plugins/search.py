@@ -248,41 +248,30 @@ async def keyboard_premium_handler(client: Client, message: Message):
 
         # Check if user is already premium
         if await is_premium_user(user_id):
-            await message.reply_text("✨ You're already a Premium Member!")
-            return
+            return await message.reply_text("✨ You're already a Premium Member!")
 
-        # Show premium plans using the correct callback data
-        premium_text = (
-            "💎 **Premium Membership Benefits**\n\n"
-            "• ⚡ **Instant Access** - Direct file downloads\n"
-            "• 🔥 **Unlimited Downloads** - No restrictions\n"
-            "• 🚫 **Ad-Free Experience** - No verification needed\n"
-            "• 👑 **Premium Support** - Priority assistance\n\n"
-            "💰 **Choose Your Plan:**"
-        )
+        # Create a mock callback to reuse existing premium function
+        from pyrogram.types import CallbackQuery
 
-        premium_buttons = InlineKeyboardMarkup([
-            [
-                InlineKeyboardButton("💎 Basic - ₹29", callback_data="buy_premium:basic"),
-                InlineKeyboardButton("🏆 Standard - ₹79", callback_data="buy_premium:standard")
-            ],
-            [
-                InlineKeyboardButton("👑 Premium - ₹149", callback_data="buy_premium:premium"),
-                InlineKeyboardButton("💎 Unlimited - ₹299", callback_data="buy_premium:unlimited")
-            ],
-            [
-                InlineKeyboardButton("❌ Cancel", callback_data="close")
-            ]
-        ])
+        class MockCallback:
+            def __init__(self, message):
+                self.message = message
+                self.from_user = message.from_user
+                self.data = "show_premium_plans"
 
-        await message.reply_text(
-            premium_text,
-            reply_markup=premium_buttons
-        )
+            async def answer(self, text="", show_alert=False):
+                pass
+
+            async def edit_message_text(self, text, reply_markup=None):
+                await self.message.reply_text(text, reply_markup=reply_markup)
+
+        mock_callback = MockCallback(message)
+        from bot.plugins.callback import show_premium_callback
+        await show_premium_callback(client, mock_callback)
 
     except Exception as e:
-        print(f"Error in keyboard_premium_handler: {e}")
-        await message.reply_text(f"❌ Error: {str(e)}")
+        print(f"ERROR in keyboard_premium_handler: {e}")
+        await message.reply_text("❌ An error occurred. Please try again.")
 
 @Client.on_callback_query(filters.regex(r"^rand_"))
 async def random_callback(client: Client, callback_query: CallbackQuery):

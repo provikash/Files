@@ -17,9 +17,11 @@ async def check_command_limit(user_id: int) -> tuple[bool, int]:
     if (user_id in Config.ADMINS or
         user_id == Config.OWNER_ID or
         await is_premium_user(user_id)):
+        print(f"DEBUG: User {user_id} has unlimited access (admin/owner/premium)")
         return False, -1  # -1 means unlimited
 
     command_count = await get_user_command_count(user_id)
+    print(f"DEBUG: User {user_id} command count check: {command_count}/3")
 
     # Every user gets exactly 3 commands before needing verification
     max_commands = 3
@@ -44,27 +46,30 @@ async def use_command(user_id: int) -> bool:
     Thread-safe implementation to prevent race conditions.
     """
     try:
-        # Skip limits for admins, owner, and premium users
+        # Skip limits entirely for admins, owner, and premium users - no counting at all
         if (user_id in Config.ADMINS or
             user_id == Config.OWNER_ID or
             await is_premium_user(user_id)):
+            print(f"DEBUG: User {user_id} has unlimited access (admin/owner/premium)")
             return True
 
-        # Get or create user-specific lock
+        # Get or create user-specific lock for regular users only
         if user_id not in _user_locks:
             _user_locks[user_id] = asyncio.Lock()
 
         async with _user_locks[user_id]:
-
             # Get current command count
             current_count = await get_user_command_count(user_id)
+            print(f"DEBUG: User {user_id} current command count: {current_count}")
 
             # Check if user has reached the limit (3 free commands)
             if current_count >= 3:
+                print(f"DEBUG: User {user_id} reached command limit")
                 return False
 
-            # Increment command count atomically
+            # Increment command count atomically for regular users only
             await increment_command_count(user_id)
+            print(f"DEBUG: Incremented command count for user {user_id} to {current_count + 1}")
             return True
 
     except Exception as e:

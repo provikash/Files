@@ -60,7 +60,7 @@ async def start_handler(client: Client, message: Message):
         except Exception:
             # If decode fails, show start message
             parts = None
-            
+
         if parts:
             try:
                 if len(parts) == 3:
@@ -151,13 +151,14 @@ async def start_handler(client: Client, message: Message):
         buttons = InlineKeyboardMarkup([
             [
                 InlineKeyboardButton("🎲 Get Random Files", callback_data="execute_rand"),
-                InlineKeyboardButton("🔥 Popular", callback_data="rand_popular")
+                InlineKeyboardButton("🆕 Recent Files", callback_data="rand_recent")
             ],
             [
-                InlineKeyboardButton("😊 About Me", callback_data="about")
+                InlineKeyboardButton("🔥 Popular Files", callback_data="rand_popular"),
+                InlineKeyboardButton("💎 Premium Plans", callback_data="show_premium_plans")
             ],
             [
-                InlineKeyboardButton("💎 Premium", callback_data="show_premium_plans"),
+                InlineKeyboardButton("😊 About", callback_data="about"),
                 InlineKeyboardButton("🔒 Close", callback_data="close")
             ]
         ])
@@ -205,12 +206,12 @@ async def handle_useless_messages(client: Client, message: Message):
     # Create synchronized custom keyboard that matches inline buttons
     custom_keyboard = ReplyKeyboardMarkup([
         [
-            KeyboardButton("🎲 Random"),
-            KeyboardButton("🆕 Recent Added")
+            KeyboardButton("🎲 Random Files"),
+            KeyboardButton("🆕 Recent Files")
         ],
         [
-            KeyboardButton("🔥 Most Popular"),
-            KeyboardButton("💎 Buy Premium")
+            KeyboardButton("🔥 Popular Files"),
+            KeyboardButton("💎 Premium Plans")
         ]
     ], resize_keyboard=True, one_time_keyboard=False)
 
@@ -233,10 +234,10 @@ async def handle_useless_messages(client: Client, message: Message):
     await message.reply_text(
         f"👋 Hi {user.first_name}!\n\n"
         f"🤖 **Please use the buttons below to navigate:**\n\n"
-        f"🎲 **Random** - Get 5 random media files instantly\n"
-        f"🆕 **Recent Added** - Latest uploaded files\n"
-        f"🔥 **Most Popular** - Most accessed files\n"
-        f"💎 **Buy Premium** - Unlimited access without ads\n\n"
+        f"🎲 **Random Files** - Get 5 random media files instantly\n"
+        f"🆕 **Recent Files** - Latest uploaded files\n"
+        f"🔥 **Popular Files** - Most accessed files\n"
+        f"💎 **Premium Plans** - Unlimited access without ads\n\n"
         f"💡 **Use either keyboard or inline buttons!**",
         reply_markup=custom_keyboard
     )

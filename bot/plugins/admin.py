@@ -5,6 +5,7 @@ from info import Config
 from bot.database import add_premium_user, remove_premium, get_users_count
 from bot.database.premium_db import get_all_premium_users
 import os
+import asyncio
 from dotenv import set_key, load_dotenv
 
 # Admin verification decorator
@@ -366,3 +367,138 @@ async def test_admin(client: Client, message: Message):
     """Test admin functionality"""
     user_id = message.from_user.id
     await message.reply_text(f"✅ Admin verification successful!\n**Your ID:** {user_id}\n**Admin Status:** Confirmed")
+
+@Client.on_message(filters.command("addpremium") & filters.private)
+@admin_only
+async def add_premium_user_cmd(client: Client, message: Message):
+    """Add premium user"""
+    if len(message.command) < 3:
+        return await message.reply_text("❌ Usage: `/addpremium <user_id> <plan>`\nPlans: basic, standard, premium, unlimited")
+    
+    try:
+        user_id = int(message.command[1])
+        plan = message.command[2].lower()
+        
+        PREMIUM_PLANS = {
+            "basic": {"tokens": 50, "price": "29"},
+            "standard": {"tokens": 150, "price": "79"},
+            "premium": {"tokens": 300, "price": "149"},
+            "unlimited": {"tokens": -1, "price": "299"}
+        }
+        
+        if plan not in PREMIUM_PLANS:
+            return await message.reply_text("❌ Invalid plan. Available plans: basic, standard, premium, unlimited")
+        
+        plan_info = PREMIUM_PLANS[plan]
+        success = await add_premium_user(user_id, plan, plan_info["tokens"])
+        
+        if success:
+            await message.reply_text(f"✅ Successfully added premium membership for user {user_id}\n**Plan:** {plan}\n**Tokens:** {plan_info['tokens'] if plan_info['tokens'] != -1 else 'Unlimited'}")
+        else:
+            await message.reply_text("❌ Failed to add premium membership. User might already be premium.")
+            
+    except ValueError:
+        await message.reply_text("❌ Invalid user ID. Please provide a valid user ID.")
+    except Exception as e:
+        await message.reply_text(f"❌ Error adding premium user: {str(e)}")
+
+@Client.on_message(filters.command("removepremium") & filters.private)
+@admin_only
+async def remove_premium_user_cmd(client: Client, message: Message):
+    """Remove premium user"""
+    if len(message.command) < 2:
+        return await message.reply_text("❌ Usage: `/removepremium <user_id>`")
+    
+    try:
+        user_id = int(message.command[1])
+        success = await remove_premium(user_id)
+        
+        if success:
+            await message.reply_text(f"✅ Successfully removed premium membership for user {user_id}")
+        else:
+            await message.reply_text("❌ Failed to remove premium membership. User might not be premium.")
+            
+    except ValueError:
+        await message.reply_text("❌ Invalid user ID. Please provide a valid user ID.")
+    except Exception as e:
+        await message.reply_text(f"❌ Error removing premium user: {str(e)}")
+
+@Client.on_message(filters.command("broadcast") & filters.private)
+@admin_only
+async def broadcast_message(client: Client, message: Message):
+    """Broadcast message to all users"""
+    if len(message.command) < 2:
+        return await message.reply_text("❌ Usage: `/broadcast <message>`\nExample: `/broadcast Hello everyone! New updates available.`")
+    
+    try:
+        broadcast_text = message.text.split(None, 1)[1]
+        
+        from bot.database import get_all_users
+        users = await get_all_users()
+        
+        if not users:
+            return await message.reply_text("❌ No users found in database.")
+        
+        status_msg = await message.reply_text(f"📢 Broadcasting to {len(users)} users...")
+        
+        success_count = 0
+        failed_count = 0
+        
+        for user_id in users:
+            try:
+                await client.send_message(user_id, broadcast_text)
+                success_count += 1
+                await asyncio.sleep(0.1)  # Avoid rate limits
+            except Exception:
+                failed_count += 1
+        
+        await status_msg.edit_text(
+            f"📢 **Broadcast Complete**\n\n"
+            f"✅ **Successful:** {success_count}\n"
+            f"❌ **Failed:** {failed_count}\n"
+            f"📊 **Total:** {len(users)}"
+        )
+        
+    except Exception as e:
+        await message.reply_text(f"❌ Error during broadcast: {str(e)}")
+
+@Client.on_message(filters.command("approveuser") & filters.private)
+@admin_only
+async def approve_user_request(client: Client, message: Message):
+    """Approve user join request"""
+    if len(message.command) < 3:
+        return await message.reply_text("❌ Usage: `/approveuser <user_id> <channel_id>`")
+    
+    try:
+        user_id = int(message.command[1])
+        channel_id = int(message.command[2])
+        
+        # Approve the user in the channel
+        await client.approve_chat_join_request(channel_id, user_id)
+        await message.reply_text(f"✅ Approved join request for user {user_id} in channel {channel_id}")
+        
+    except ValueError:
+        await message.reply_text("❌ Invalid user ID or channel ID.")
+    except Exception as e:
+        await message.reply_text(f"❌ Error approving user: {str(e)}")
+
+@Client.on_message(filters.command("pendingrequests") & filters.private)
+@admin_only
+async def pending_requests(client: Client, message: Message):
+    """View pending join requests"""
+    request_channels = getattr(Config, 'REQUEST_CHANNEL', [])
+    
+    if not request_channels:
+        return await message.reply_text("❌ No request channels configured.")
+    
+    pending_text = "🔔 **Pending Join Requests:**\n\n"
+    
+    for channel_id in request_channels:
+        try:
+            chat = await client.get_chat(channel_id)
+            pending_text += f"**{chat.title}** (`{channel_id}`)\n"
+            pending_text += f"Use `/approveuser <user_id> {channel_id}` to approve requests\n\n"
+        except Exception as e:
+            pending_text += f"**Channel {channel_id}:** Error accessing - {str(e)}\n\n"
+    
+    await message.reply_text(pending_text)
