@@ -20,7 +20,7 @@ class Config(object):
         super().__delattr__(name)
 
     # Bot Configuration - Load from environment
-    API_ID = int(getenv("API_ID"))
+    API_ID = getenv("API_ID")
     API_HASH = getenv("API_HASH")
     BOT_TOKEN = getenv("BOT_TOKEN")
     BOT_WORKERS = int(getenv("BOT_WORKERS", "4"))
@@ -28,6 +28,9 @@ class Config(object):
     # Validate required environment variables
     if not API_ID or not API_HASH or not BOT_TOKEN:
         raise ValueError("Missing required environment variables: API_ID, API_HASH, or BOT_TOKEN")
+    
+    # Convert API_ID to int after validation
+    API_ID = int(API_ID)
 
     # Webhook settings
     WEB_MODE = getenv("WEB_MODE", "False").lower() in ("true", "1", "yes")
@@ -35,9 +38,17 @@ class Config(object):
     HOST = getenv("HOST", "0.0.0.0")
 
     # Channel Configuration - Load from environment
-    CHANNEL_ID = int(getenv("CHANNEL_ID"))
-    INDEX_CHANNEL_ID = int(getenv("INDEX_CHANNEL_ID"))
-    OWNER_ID = int(getenv("OWNER_ID"))
+    CHANNEL_ID = getenv("CHANNEL_ID")
+    INDEX_CHANNEL_ID = getenv("INDEX_CHANNEL_ID")
+    OWNER_ID = getenv("OWNER_ID")
+    
+    # Validate and convert channel/owner IDs
+    if not CHANNEL_ID or not INDEX_CHANNEL_ID or not OWNER_ID:
+        raise ValueError("Missing required environment variables: CHANNEL_ID, INDEX_CHANNEL_ID, or OWNER_ID")
+    
+    CHANNEL_ID = int(CHANNEL_ID)
+    INDEX_CHANNEL_ID = int(INDEX_CHANNEL_ID)
+    OWNER_ID = int(OWNER_ID)
 
     # Database - Load from environment
     DATABASE_URL = getenv("DATABASE_URL")
