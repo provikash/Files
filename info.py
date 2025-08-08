@@ -84,8 +84,7 @@ class Config(object):
     VERIFY_MODE = getenv("VERIFY_MODE", "True").lower() in ("true", "1", "yes")
     SHORTLINK_API = getenv("SHORTLINK_API")
     SHORTLINK_URL = getenv("SHORTLINK_URL", "https://teraboxlinks.com/")
-
-TUTORIAL = getenv("TUTORIAL","https://t.me/alfhamovies/13")
+    TUTORIAL = getenv("TUTORIAL","https://t.me/alfhamovies/13")
 
     # Bot Messages - Load from environment
 BOT_STATS_TEXT = getenv("BOT_STATS_TEXT", "<b>BOT UPTIME</b>\n{uptime}")
