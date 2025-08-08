@@ -369,6 +369,49 @@ async def popular_files_callback(client, query: CallbackQuery):
         print(f"Traceback: {traceback.format_exc()}")
         await query.answer("❌ An error occurred. Please try again.", show_alert=True)
 
+@Client.on_callback_query(filters.regex("^rand_stats$"))
+async def rand_stats_callback(client, query: CallbackQuery):
+    """Handle stats button click from random files"""
+    try:
+        # Check force subscription first
+        if await handle_force_sub(client, query.message):
+            await query.answer()
+            return
+
+        user_id = query.from_user.id
+
+        from bot.database import get_command_stats
+        from bot.utils.command_verification import check_command_limit
+
+        stats = await get_command_stats(user_id)
+        needs_verification, remaining = await check_command_limit(user_id)
+
+        status_text = "🔥 **Unlimited**" if remaining == -1 else f"🆓 **{remaining}/3**" if remaining > 0 else "❌ **Limit Reached**"
+
+        stats_text = f"""📊 **Your Usage Stats**
+
+👤 **User:** {query.from_user.first_name}
+🎯 **Current Status:** {status_text}
+📈 **Total Commands Used:** {stats['command_count']}
+
+⏰ **Last Command:** {stats['last_command_at'].strftime('%Y-%m-%d %H:%M UTC') if stats['last_command_at'] else 'Never'}
+🔄 **Last Reset:** {stats['last_reset'].strftime('%Y-%m-%d %H:%M UTC') if stats['last_reset'] else 'Never'}
+
+💡 **Get Premium** for unlimited access!"""
+
+        await query.edit_message_text(
+            stats_text,
+            reply_markup=InlineKeyboardMarkup([
+                [InlineKeyboardButton("🎲 More Random", callback_data="rand_new")],
+                [InlineKeyboardButton("💎 Premium", callback_data="show_premium_plans")],
+                [InlineKeyboardButton("🔒 Close", callback_data="close")]
+            ])
+        )
+
+    except Exception as e:
+        print(f"ERROR in rand_stats_callback: {e}")
+        await query.answer("❌ Error retrieving stats. Please try again.", show_alert=True)
+
 @Client.on_callback_query(filters.regex("^rand_new$"))
 async def new_random_callback(client, query: CallbackQuery):
     """Handle More Random button click - send new random files"""

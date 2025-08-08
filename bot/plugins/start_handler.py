@@ -195,14 +195,14 @@ async def start_handler(client: Client, message: Message):
 
 @Client.on_message(filters.private & filters.text & ~filters.command(['start', 'token', 'rand', 'recent', 'popular']) & ~filters.regex(r"^(🎲 Random|🆕 Recent Added|🔥 Most Popular|💎 Buy Premium)$"))
 async def handle_useless_messages(client: Client, message: Message):
-    """Handle any useless/random text messages with custom keyboard"""
+    """Handle any useless/random text messages with synchronized keyboards"""
     user = message.from_user
 
     # Check force subscription first
     if await handle_force_sub(client, message):
         return
 
-    # Create custom keyboard with main options (only after force sub verification)
+    # Create synchronized custom keyboard that matches inline buttons
     custom_keyboard = ReplyKeyboardMarkup([
         [
             KeyboardButton("🎲 Random"),
@@ -214,15 +214,15 @@ async def handle_useless_messages(client: Client, message: Message):
         ]
     ], resize_keyboard=True, one_time_keyboard=False)
 
-    # Create inline buttons for additional options
+    # Create inline buttons that match the custom keyboard functionality
     inline_buttons = InlineKeyboardMarkup([
         [
-            InlineKeyboardButton("🎲 Get Random Files", callback_data="execute_rand"),
-            InlineKeyboardButton("🔥 Popular", callback_data="rand_popular")
+            InlineKeyboardButton("🎲 Random Files", callback_data="execute_rand"),
+            InlineKeyboardButton("🆕 Recent Files", callback_data="rand_recent")
         ],
         [
-            InlineKeyboardButton("🆕 Recent", callback_data="rand_recent"),
-            InlineKeyboardButton("💎 Premium", callback_data="show_premium_plans")
+            InlineKeyboardButton("🔥 Popular Files", callback_data="rand_popular"),
+            InlineKeyboardButton("💎 Premium Plans", callback_data="show_premium_plans")
         ],
         [
             InlineKeyboardButton("😊 About", callback_data="about"),
@@ -232,17 +232,17 @@ async def handle_useless_messages(client: Client, message: Message):
 
     await message.reply_text(
         f"👋 Hi {user.first_name}!\n\n"
-        f"🤖 **Please use the reply buttons below to navigate:**\n\n"
+        f"🤖 **Please use the buttons below to navigate:**\n\n"
         f"🎲 **Random** - Get 5 random media files instantly\n"
         f"🆕 **Recent Added** - Latest uploaded files\n"
         f"🔥 **Most Popular** - Most accessed files\n"
         f"💎 **Buy Premium** - Unlimited access without ads\n\n"
-        f"💡 **Choose from the keyboard buttons below or use inline options!**",
+        f"💡 **Use either keyboard or inline buttons!**",
         reply_markup=custom_keyboard
     )
 
-    # Send inline buttons in a separate message for better UX
+    # Send inline buttons as alternative option
     await message.reply_text(
-        "🚀 **Quick Access Menu:**\n\nTap any button below for instant access!",
+        "🚀 **Or use these quick buttons:**",
         reply_markup=inline_buttons
     )

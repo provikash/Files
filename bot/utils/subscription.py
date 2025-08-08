@@ -164,6 +164,12 @@ async def handle_force_sub(client, message: Message):
         final_message += f"\n🔽 <b>Instructions:</b>\n"
         final_message += f"📢 <b>Force Sub:</b> Click the buttons below to join the required channels."
 
+    # Ensure message doesn't exceed Telegram's 4096 character limit
+    if len(final_message) > 4096:
+        # Truncate the message and add indicator
+        final_message = final_message[:4090] + "..."
+        print(f"WARNING: Force subscription message truncated due to length: {len(final_message)} chars")
+
     # If buttons exist, add markup
     reply_markup = InlineKeyboardMarkup(buttons) if buttons else None
 
@@ -176,8 +182,17 @@ async def handle_force_sub(client, message: Message):
         return True
     except Exception as e:
         print(f"Error sending force subscription message: {e}")
-        await message.reply(
-            final_message,
-            disable_web_page_preview=True
-        )
+        # Try sending without formatting if there's still an error
+        try:
+            clean_message = final_message.replace("<b>", "").replace("</b>", "")
+            if len(clean_message) > 4096:
+                clean_message = clean_message[:4090] + "..."
+            await message.reply(
+                clean_message,
+                reply_markup=reply_markup,
+                disable_web_page_preview=True
+            )
+        except Exception as e2:
+            print(f"Error sending fallback message: {e2}")
+            await message.reply("❌ Please join the required channels to continue.")
         return True
