@@ -860,3 +860,10 @@ pyrogram.errors.exceptions.bad_request_400.EntityBoundsInvalid: Telegram says: [
 Created by 
 https://t.me/ps_updates
 [08-Aug-25 20:38:37 - INFO] - apscheduler.scheduler - Scheduler started
+[08-Aug-25 21:02:54 - INFO] - root - Stop signal received (SIGTERM). Exiting...
+[08-Aug-25 21:02:54 - INFO] - bot - Bot stopped.
+[08-Aug-25 21:03:00 - INFO] - bot - Bot Running..!
+
+Created by 
+https://t.me/ps_updates
+[08-Aug-25 21:03:00 - INFO] - apscheduler.scheduler - Scheduler started
