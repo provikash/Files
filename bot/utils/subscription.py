@@ -48,7 +48,7 @@ async def handle_force_sub(client, message: Message):
                 joined.append(ch)
             elif member.status == ChatMemberStatus.RESTRICTED:
                 # User has pending join request
-                not_joined_request.append(ch)
+                joined.append(ch)
             else:
                 not_joined_request.append(ch)
         except Exception:

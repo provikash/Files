@@ -711,3 +711,17 @@ https://t.me/ps_updates
 Created by 
 https://t.me/ps_updates
 [08-Aug-25 19:36:25 - INFO] - apscheduler.scheduler - Scheduler started
+[08-Aug-25 19:49:53 - INFO] - root - Stop signal received (SIGTERM). Exiting...
+[08-Aug-25 19:49:53 - INFO] - bot - Bot stopped.
+[08-Aug-25 19:49:59 - INFO] - bot - Bot Running..!
+
+Created by 
+https://t.me/ps_updates
+[08-Aug-25 19:49:59 - INFO] - apscheduler.scheduler - Scheduler started
+[08-Aug-25 19:52:36 - INFO] - root - Stop signal received (SIGTERM). Exiting...
+[08-Aug-25 19:52:36 - INFO] - bot - Bot stopped.
+[08-Aug-25 19:52:45 - INFO] - bot - Bot Running..!
+
+Created by 
+https://t.me/ps_updates
+[08-Aug-25 19:52:45 - INFO] - apscheduler.scheduler - Scheduler started
