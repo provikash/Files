@@ -877,3 +877,140 @@ https://t.me/ps_updates
 Created by 
 https://t.me/ps_updates
 [09-Aug-25 09:29:01 - INFO] - apscheduler.scheduler - Scheduler started
+[09-Aug-25 09:33:29 - INFO] - root - Stop signal received (SIGTERM). Exiting...
+[09-Aug-25 09:33:29 - INFO] - bot - Bot stopped.
+[09-Aug-25 09:33:34 - INFO] - bot - Bot Running..!
+
+Created by 
+https://t.me/ps_updates
+[09-Aug-25 09:33:34 - INFO] - apscheduler.scheduler - Scheduler started
+[09-Aug-25 09:39:11 - ERROR] - pyrogram.dispatcher - Telegram says: [400 ENTITY_BOUNDS_INVALID] (caused by "messages.SendMessage") Pyrogram 2.3.45 thinks: The message entity bounds are invalid
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/dispatcher.py", line 363, in handler_worker
+    await handler.callback(self.client, *args)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/handlers/message_handler.py", line 154, in resolve_future_or_callback
+    await self.original_callback(client, message, *args)
+  File "/home/runner/workspace/bot/plugins/admin.py", line 17, in wrapper
+    return await func(client, message)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/bot/plugins/admin.py", line 118, in remove_force_channel
+    return await message.reply_text("❌ Usage: `/removeforce <channel_id>`")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/types/messages_and_media/message.py", line 1482, in reply_text
+    return await self._client.send_message(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/methods/messages/send_message.py", line 200, in send_message
+    r = await self.invoke(rpc)
+        ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/methods/advanced/invoke.py", line 80, in invoke
+    r = await self.session.invoke(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/session/session.py", line 420, in invoke
+    return await self.send(query, timeout=timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/session/session.py", line 377, in send
+    RPCError.raise_it(result, type(data))
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/errors/rpc_error.py", line 93, in raise_it
+    raise getattr(
+pyrogram.errors.exceptions.bad_request_400.EntityBoundsInvalid: Telegram says: [400 ENTITY_BOUNDS_INVALID] (caused by "messages.SendMessage") Pyrogram 2.3.45 thinks: The message entity bounds are invalid
+[09-Aug-25 09:39:59 - ERROR] - pyrogram.dispatcher - Telegram says: [400 ENTITY_BOUNDS_INVALID] (caused by "messages.SendMessage") Pyrogram 2.3.45 thinks: The message entity bounds are invalid
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/dispatcher.py", line 363, in handler_worker
+    await handler.callback(self.client, *args)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/handlers/message_handler.py", line 154, in resolve_future_or_callback
+    await self.original_callback(client, message, *args)
+  File "/home/runner/workspace/bot/plugins/admin.py", line 17, in wrapper
+    return await func(client, message)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/bot/plugins/admin.py", line 410, in remove_premium_user_cmd
+    return await message.reply_text("❌ Usage: `/removepremium <user_id>`")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/types/messages_and_media/message.py", line 1482, in reply_text
+    return await self._client.send_message(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/methods/messages/send_message.py", line 200, in send_message
+    r = await self.invoke(rpc)
+        ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/methods/advanced/invoke.py", line 80, in invoke
+    r = await self.session.invoke(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/session/session.py", line 420, in invoke
+    return await self.send(query, timeout=timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/session/session.py", line 377, in send
+    RPCError.raise_it(result, type(data))
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/errors/rpc_error.py", line 93, in raise_it
+    raise getattr(
+pyrogram.errors.exceptions.bad_request_400.EntityBoundsInvalid: Telegram says: [400 ENTITY_BOUNDS_INVALID] (caused by "messages.SendMessage") Pyrogram 2.3.45 thinks: The message entity bounds are invalid
+[09-Aug-25 09:40:01 - ERROR] - pyrogram.dispatcher - Telegram says: [400 ENTITY_BOUNDS_INVALID] (caused by "messages.SendMessage") Pyrogram 2.3.45 thinks: The message entity bounds are invalid
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/dispatcher.py", line 363, in handler_worker
+    await handler.callback(self.client, *args)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/handlers/message_handler.py", line 154, in resolve_future_or_callback
+    await self.original_callback(client, message, *args)
+  File "/home/runner/workspace/bot/plugins/admin.py", line 17, in wrapper
+    return await func(client, message)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/bot/plugins/admin.py", line 410, in remove_premium_user_cmd
+    return await message.reply_text("❌ Usage: `/removepremium <user_id>`")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/types/messages_and_media/message.py", line 1482, in reply_text
+    return await self._client.send_message(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/methods/messages/send_message.py", line 200, in send_message
+    r = await self.invoke(rpc)
+        ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/methods/advanced/invoke.py", line 80, in invoke
+    r = await self.session.invoke(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/session/session.py", line 420, in invoke
+    return await self.send(query, timeout=timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/session/session.py", line 377, in send
+    RPCError.raise_it(result, type(data))
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/errors/rpc_error.py", line 93, in raise_it
+    raise getattr(
+pyrogram.errors.exceptions.bad_request_400.EntityBoundsInvalid: Telegram says: [400 ENTITY_BOUNDS_INVALID] (caused by "messages.SendMessage") Pyrogram 2.3.45 thinks: The message entity bounds are invalid
+[09-Aug-25 09:41:03 - ERROR] - pyrogram.dispatcher - Telegram says: [400 ENTITY_BOUNDS_INVALID] (caused by "messages.SendMessage") Pyrogram 2.3.45 thinks: The message entity bounds are invalid
+Traceback (most recent call last):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/dispatcher.py", line 363, in handler_worker
+    await handler.callback(self.client, *args)
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/handlers/message_handler.py", line 154, in resolve_future_or_callback
+    await self.original_callback(client, message, *args)
+  File "/home/runner/workspace/bot/plugins/admin.py", line 17, in wrapper
+    return await func(client, message)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/bot/plugins/admin.py", line 410, in remove_premium_user_cmd
+    return await message.reply_text("❌ Usage: `/removepremium <user_id>`")
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/types/messages_and_media/message.py", line 1482, in reply_text
+    return await self._client.send_message(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/methods/messages/send_message.py", line 200, in send_message
+    r = await self.invoke(rpc)
+        ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/methods/advanced/invoke.py", line 80, in invoke
+    r = await self.session.invoke(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/session/session.py", line 420, in invoke
+    return await self.send(query, timeout=timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/session/session.py", line 377, in send
+    RPCError.raise_it(result, type(data))
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/errors/rpc_error.py", line 93, in raise_it
+    raise getattr(
+pyrogram.errors.exceptions.bad_request_400.EntityBoundsInvalid: Telegram says: [400 ENTITY_BOUNDS_INVALID] (caused by "messages.SendMessage") Pyrogram 2.3.45 thinks: The message entity bounds are invalid
+[09-Aug-25 09:45:27 - WARNING] - pyrogram.session.session - [PS-LinkVault] Waiting for 3 seconds before continuing (required by "messages.SendMessage")
+[09-Aug-25 09:45:27 - WARNING] - pyrogram.session.session - [PS-LinkVault] Waiting for 3 seconds before continuing (required by "messages.SendMedia")
+[09-Aug-25 09:45:28 - WARNING] - pyrogram.session.session - [PS-LinkVault] Waiting for 3 seconds before continuing (required by "messages.SendMedia")
+[09-Aug-25 09:45:28 - WARNING] - pyrogram.session.session - [PS-LinkVault] Waiting for 3 seconds before continuing (required by "messages.SendMedia")
+[09-Aug-25 09:45:52 - WARNING] - pyrogram.session.session - [PS-LinkVault] Waiting for 8 seconds before continuing (required by "messages.SendMedia")
+[09-Aug-25 09:45:53 - WARNING] - pyrogram.session.session - [PS-LinkVault] Waiting for 7 seconds before continuing (required by "messages.SendMedia")
+[09-Aug-25 09:45:53 - WARNING] - pyrogram.session.session - [PS-LinkVault] Waiting for 7 seconds before continuing (required by "messages.SendMedia")
+[09-Aug-25 09:45:54 - WARNING] - pyrogram.session.session - [PS-LinkVault] Waiting for 6 seconds before continuing (required by "messages.SendMedia")
+[09-Aug-25 09:46:00 - WARNING] - pyrogram.session.session - [PS-LinkVault] Waiting for 3 seconds before continuing (required by "messages.SendMedia")
+[09-Aug-25 09:46:26 - WARNING] - pyrogram.session.session - [PS-LinkVault] Waiting for 5 seconds before continuing (required by "messages.EditMessage")
+[09-Aug-25 09:46:26 - WARNING] - pyrogram.session.session - [PS-LinkVault] Waiting for 4 seconds before continuing (required by "messages.EditMessage")
+[09-Aug-25 09:46:26 - WARNING] - pyrogram.session.session - [PS-LinkVault] Waiting for 4 seconds before continuing (required by "messages.EditMessage")
+[09-Aug-25 09:46:30 - WARNING] - pyrogram.session.session - [PS-LinkVault] Waiting for 3 seconds before continuing (required by "messages.EditMessage")
+[09-Aug-25 09:46:30 - WARNING] - pyrogram.session.session - [PS-LinkVault] Waiting for 3 seconds before continuing (required by "messages.EditMessage")
