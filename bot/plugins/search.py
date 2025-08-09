@@ -48,11 +48,11 @@ async def random_command(client: Client, message: Message):
         except Exception as reply_error:
             print(f"ERROR: Could not send error reply: {reply_error}")
 
-@Client.on_message(filters.private & filters.text & filters.regex(r"^🎲 Random Files$"))
+@Client.on_message(filters.private & filters.text & filters.regex(r"^🎲 Random$"))
 async def keyboard_random_handler(client: Client, message: Message):
-    """Handle Random Files button press from custom keyboard"""
+    """Handle Random button press from custom keyboard"""
     try:
-        print(f"DEBUG: Keyboard Random Files handler triggered by user {message.from_user.id}")
+        print(f"DEBUG: Keyboard random handler triggered by user {message.from_user.id}")
 
         # Check force subscription first
         if await handle_force_sub(client, message):
@@ -60,39 +60,28 @@ async def keyboard_random_handler(client: Client, message: Message):
 
         user_id = message.from_user.id
 
-        # Check if user has unlimited access (premium/admin) first
-        from bot.database import is_premium_user
-        from bot.utils.admin_verification import is_admin_or_owner
+        # Check command limit first
+        needs_verification, remaining = await check_command_limit(user_id)
 
-        is_premium = await is_premium_user(user_id)
-        is_admin = await is_admin_or_owner(user_id)
+        if needs_verification or remaining <= 0:
+            # Create verification button
+            buttons = InlineKeyboardMarkup([
+                [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
+                [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")]
+            ])
 
-        if not (is_premium or is_admin):
-            # Check command limit only for regular users
-            needs_verification, remaining = await check_command_limit(user_id)
+            await message.reply_text(
+                f"⚠️ **Command Limit Reached!**\n\n"
+                f"You've used all your free commands (3/3).\n\n"
+                f"🔓 **Get instant access by:**\n"
+                f"• Getting a verification token (with ads)\n"
+                f"• Upgrading to Premium (no ads)\n\n"
+                f"💡 Premium users get unlimited access without verification!",
+                reply_markup=buttons
+            )
+            return
 
-            if needs_verification or remaining <= 0:
-                # Create verification button
-                buttons = InlineKeyboardMarkup([
-                    [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
-                    [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")]
-                ])
-
-                await message.reply_text(
-                    f"⚠️ **Command Limit Reached!**\n\n"
-                    f"You've used all your free commands (3/3).\n\n"
-                    f"🔓 **Get instant access by:**\n"
-                    f"• Getting a verification token (with ads)\n"
-                    f"• Upgrading to Premium (no ads)\n\n"
-                    f"💡 Premium users get unlimited access without verification!",
-                    reply_markup=buttons
-                )
-                return
-        else:
-            # Premium/admin users bypass command limit
-            print(f"DEBUG: User {user_id} has unlimited access (premium/admin)")
-
-        # Try to use command for regular users only
+        # Try to use command
         if not await use_command(user_id):
             buttons = InlineKeyboardMarkup([
                 [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
@@ -129,39 +118,28 @@ async def keyboard_recent_handler(client: Client, message: Message):
 
         user_id = message.from_user.id
 
-        # Check if user has unlimited access (premium/admin) first
-        from bot.database import is_premium_user
-        from bot.utils.admin_verification import is_admin_or_owner
+        # Check command limit first
+        needs_verification, remaining = await check_command_limit(user_id)
 
-        is_premium = await is_premium_user(user_id)
-        is_admin = await is_admin_or_owner(user_id)
+        if needs_verification or remaining <= 0:
+            # Create verification button
+            buttons = InlineKeyboardMarkup([
+                [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
+                [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")]
+            ])
 
-        if not (is_premium or is_admin):
-            # Check command limit only for regular users
-            needs_verification, remaining = await check_command_limit(user_id)
+            await message.reply_text(
+                f"⚠️ **Command Limit Reached!**\n\n"
+                f"You've used all your free commands (3/3).\n\n"
+                f"🔓 **Get instant access by:**\n"
+                f"• Getting a verification token (with ads)\n"
+                f"• Upgrading to Premium (no ads)\n\n"
+                f"💡 Premium users get unlimited access without verification!",
+                reply_markup=buttons
+            )
+            return
 
-            if needs_verification or remaining <= 0:
-                # Create verification button
-                buttons = InlineKeyboardMarkup([
-                    [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
-                    [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")]
-                ])
-
-                await message.reply_text(
-                    f"⚠️ **Command Limit Reached!**\n\n"
-                    f"You've used all your free commands (3/3).\n\n"
-                    f"🔓 **Get instant access by:**\n"
-                    f"• Getting a verification token (with ads)\n"
-                    f"• Upgrading to Premium (no ads)\n\n"
-                    f"💡 Premium users get unlimited access without verification!",
-                    reply_markup=buttons
-                )
-                return
-        else:
-            # Premium/admin users bypass command limit
-            print(f"DEBUG: User {user_id} has unlimited access (premium/admin)")
-
-        # Try to use command for regular users only
+        # Try to use command
         if not await use_command(user_id):
             buttons = InlineKeyboardMarkup([
                 [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
@@ -198,39 +176,28 @@ async def keyboard_popular_handler(client: Client, message: Message):
 
         user_id = message.from_user.id
 
-        # Check if user has unlimited access (premium/admin) first
-        from bot.database import is_premium_user
-        from bot.utils.admin_verification import is_admin_or_owner
+        # Check command limit first
+        needs_verification, remaining = await check_command_limit(user_id)
 
-        is_premium = await is_premium_user(user_id)
-        is_admin = await is_admin_or_owner(user_id)
+        if needs_verification or remaining <= 0:
+            # Create verification button
+            buttons = InlineKeyboardMarkup([
+                [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
+                [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")]
+            ])
 
-        if not (is_premium or is_admin):
-            # Check command limit only for regular users
-            needs_verification, remaining = await check_command_limit(user_id)
+            await message.reply_text(
+                f"⚠️ **Command Limit Reached!**\n\n"
+                f"You've used all your free commands (3/3).\n\n"
+                f"🔓 **Get instant access by:**\n"
+                f"• Getting a verification token (with ads)\n"
+                f"• Upgrading to Premium (no ads)\n\n"
+                f"💡 Premium users get unlimited access without verification!",
+                reply_markup=buttons
+            )
+            return
 
-            if needs_verification or remaining <= 0:
-                # Create verification button
-                buttons = InlineKeyboardMarkup([
-                    [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
-                    [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")]
-                ])
-
-                await message.reply_text(
-                    f"⚠️ **Command Limit Reached!**\n\n"
-                    f"You've used all your free commands (3/3).\n\n"
-                    f"🔓 **Get instant access by:**\n"
-                    f"• Getting a verification token (with ads)\n"
-                    f"• Upgrading to Premium (no ads)\n\n"
-                    f"💡 Premium users get unlimited access without verification!",
-                    reply_markup=buttons
-                )
-                return
-        else:
-            # Premium/admin users bypass command limit
-            print(f"DEBUG: User {user_id} has unlimited access (premium/admin)")
-
-        # Try to use command for regular users only
+        # Try to use command
         if not await use_command(user_id):
             buttons = InlineKeyboardMarkup([
                 [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
@@ -251,6 +218,7 @@ async def keyboard_popular_handler(client: Client, message: Message):
         # Create a mock callback query to reuse existing popular files function
         from pyrogram.types import CallbackQuery
 
+        # Create a temporary callback-like object
         class MockCallback:
             def __init__(self, message):
                 self.message = message
@@ -280,32 +248,21 @@ async def keyboard_random_handler_sync(client: Client, message: Message):
 
         user_id = message.from_user.id
 
-        # Check if user has unlimited access (premium/admin) first
-        from bot.database import is_premium_user
-        from bot.utils.admin_verification import is_admin_or_owner
+        # First check if verification is needed
+        needs_verification, remaining = await check_command_limit(user_id)
 
-        is_premium = await is_premium_user(user_id)
-        is_admin = await is_admin_or_owner(user_id)
+        if needs_verification:
+            buttons = [
+                [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
+                [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")]
+            ]
+            await message.reply_text(
+                "🔐 **Verification Required!**\n\nYou need to verify your account to continue. Get a verification token to access 3 more commands!",
+                reply_markup=InlineKeyboardMarkup(buttons)
+            )
+            return
 
-        if not (is_premium or is_admin):
-            # First check if verification is needed
-            needs_verification, remaining = await check_command_limit(user_id)
-
-            if needs_verification:
-                buttons = [
-                    [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
-                    [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")]
-                ]
-                await message.reply_text(
-                    "🔐 **Verification Required!**\n\nYou need to verify your account to continue. Get a verification token to access 3 more commands!",
-                    reply_markup=InlineKeyboardMarkup(buttons)
-                )
-                return
-        else:
-            # Premium/admin users bypass command limit
-            print(f"DEBUG: User {user_id} has unlimited access (premium/admin)")
-
-        # Try to use command for regular users only
+        # Try to use command
         if not await use_command(user_id):
             buttons = [
                 [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
@@ -541,10 +498,12 @@ async def handle_random_files(client: Client, message, is_callback: bool = False
                     # Create custom keyboard with the requested buttons
                     custom_keyboard = ReplyKeyboardMarkup([
                         [
-                            KeyboardButton("🎲 Random")
+                            KeyboardButton("🎲 Random"),
+                            KeyboardButton("🆕 Recent Added")
                         ],
                         [
-                            KeyboardButton("💎 Buy Premium")
+                            KeyboardButton("💎 Buy Premium"),
+                            KeyboardButton("🔥 Most Popular")
                         ]
                     ], resize_keyboard=True, one_time_keyboard=False)
 
@@ -916,10 +875,12 @@ async def handle_recent_files_direct(client: Client, message, is_callback: bool 
                     # Create custom keyboard
                     custom_keyboard = ReplyKeyboardMarkup([
                         [
-                            KeyboardButton("🎲 Random")
+                            KeyboardButton("🎲 Random"),
+                            KeyboardButton("🆕 Recent Added")
                         ],
                         [
-                            KeyboardButton("💎 Buy Premium")
+                            KeyboardButton("💎 Buy Premium"),
+                            KeyboardButton("🔥 Most Popular")
                         ]
                     ], resize_keyboard=True, one_time_keyboard=False)
 
@@ -1181,10 +1142,12 @@ async def handle_popular_files_direct(client: Client, message: Message, is_callb
                     # Create custom keyboard
                     custom_keyboard = ReplyKeyboardMarkup([
                         [
-                            KeyboardButton("🎲 Random")
+                            KeyboardButton("🎲 Random"),
+                            KeyboardButton("🆕 Recent Added")
                         ],
                         [
-                            KeyboardButton("💎 Buy Premium")
+                            KeyboardButton("💎 Buy Premium"),
+                            KeyboardButton("🔥 Most Popular")
                         ]
                     ], resize_keyboard=True, one_time_keyboard=False)
 
@@ -1362,6 +1325,7 @@ async def popular_files_command(client: Client, message: Message):
                 reply_markup=buttons
             )
             return
+
         await handle_popular_files_direct(client, message, is_callback=False)
     except Exception as e:
         print(f"Error in popular_files_command: {e}")
