@@ -37,7 +37,7 @@ Deploy on your favorite cloud platform:
 <summary>Click to expand
 </summary>
 
-  
+
 This project has **not been tested on Render**. While deployment might work, some users have reported account suspensions.  
 If you choose to deploy on Render, **do so at your own risk**. We are not responsible for any account bans, suspensions, or data loss.
 
