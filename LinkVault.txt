@@ -1014,3 +1014,8 @@ pyrogram.errors.exceptions.bad_request_400.EntityBoundsInvalid: Telegram says: [
 [09-Aug-25 09:46:26 - WARNING] - pyrogram.session.session - [PS-LinkVault] Waiting for 4 seconds before continuing (required by "messages.EditMessage")
 [09-Aug-25 09:46:30 - WARNING] - pyrogram.session.session - [PS-LinkVault] Waiting for 3 seconds before continuing (required by "messages.EditMessage")
 [09-Aug-25 09:46:30 - WARNING] - pyrogram.session.session - [PS-LinkVault] Waiting for 3 seconds before continuing (required by "messages.EditMessage")
+[09-Aug-25 11:52:16 - INFO] - bot - Bot Running..!
+
+Created by 
+https://t.me/ps_updates
+[09-Aug-25 11:52:16 - INFO] - apscheduler.scheduler - Scheduler started
