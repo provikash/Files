@@ -2,9 +2,6 @@ from datetime import datetime
 from .connection import db
 from info import Config
 
-# Export functions that are imported by other modules
-from bot.utils.command_verification import check_command_limit, use_command
-
 command_usage_col = db["command_usage"]
 
 async def get_user_command_count(user_id: int) -> int:
