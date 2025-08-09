@@ -6,6 +6,7 @@ from bot.database import add_premium_user, remove_premium, get_users_count
 from bot.database.premium_db import get_all_premium_users
 import os
 import asyncio
+import traceback
 from dotenv import set_key, load_dotenv
 
 # Admin verification decorator

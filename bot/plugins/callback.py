@@ -8,6 +8,9 @@ from bot.database import add_user, present_user, is_verified, validate_token_and
 from bot.utils.command_verification import check_command_limit, use_command
 from bot.database.verify_db import create_verification_token
 import traceback
+from bot.database.premium_db import get_all_premium_users, get_premium_info
+from bot.utils.subscription import handle_force_sub
+
 
 @Client.on_callback_query(filters.regex("^about$"))
 async def about_callback(client, query: CallbackQuery):
@@ -399,7 +402,7 @@ async def rand_stats_callback(client, query: CallbackQuery):
         stats = await get_command_stats(user_id)
         needs_verification, remaining = await check_command_limit(user_id)
 
-        status_text = "🔥 **Unlimited**" if remaining == -1 else f"🆓 **{remaining}/3**" if remaining > 0 else "❌ **Limit Reached**"
+        status_text = "🔥 **Unlimited**" if remaining == -1 else "🆓 **{remaining}/3**" if remaining > 0 else "❌ **Limit Reached**"
 
         stats_text = f"""📊 **Your Usage Stats**
 
