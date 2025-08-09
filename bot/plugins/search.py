@@ -63,7 +63,8 @@ async def keyboard_random_handler(client: Client, message: Message):
         # Check command limit first
         needs_verification, remaining = await check_command_limit(user_id)
 
-        if needs_verification or remaining <= 0:
+        # Only show verification dialog if user actually needs verification AND has no remaining commands
+        if needs_verification and remaining <= 0:
             # Create verification button
             buttons = InlineKeyboardMarkup([
                 [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
@@ -81,20 +82,14 @@ async def keyboard_random_handler(client: Client, message: Message):
             )
             return
 
-        # Try to use command
+        # Try to use command (this will handle admin/premium logic internally)
         if not await use_command(user_id):
             buttons = InlineKeyboardMarkup([
                 [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
                 [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")]
             ])
-
             await message.reply_text(
-                f"⚠️ **Command Limit Reached!**\n\n"
-                f"You've used all your free commands (3/3).\n\n"
-                f"🔓 **Get instant access by:**\n"
-                f"• Getting a verification token (with ads)\n"
-                f"• Upgrading to Premium (no ads)\n\n"
-                f"💡 Premium users get unlimited access without verification!",
+                "🔐 **Command Limit Reached!**\n\nYou've used all your free commands. Please verify to get 3 more commands or upgrade to Premium for unlimited access!",
                 reply_markup=buttons
             )
             return
@@ -121,7 +116,8 @@ async def keyboard_recent_handler(client: Client, message: Message):
         # Check command limit first
         needs_verification, remaining = await check_command_limit(user_id)
 
-        if needs_verification or remaining <= 0:
+        # Only show verification dialog if user actually needs verification AND has no remaining commands
+        if needs_verification and remaining <= 0:
             # Create verification button
             buttons = InlineKeyboardMarkup([
                 [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
@@ -139,20 +135,14 @@ async def keyboard_recent_handler(client: Client, message: Message):
             )
             return
 
-        # Try to use command
+        # Try to use command (this will handle admin/premium logic internally)
         if not await use_command(user_id):
             buttons = InlineKeyboardMarkup([
                 [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
                 [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")]
             ])
-
             await message.reply_text(
-                f"⚠️ **Command Limit Reached!**\n\n"
-                f"You've used all your free commands (3/3).\n\n"
-                f"🔓 **Get instant access by:**\n"
-                f"• Getting a verification token (with ads)\n"
-                f"• Upgrading to Premium (no ads)\n\n"
-                f"💡 Premium users get unlimited access without verification!",
+                "🔐 **Command Limit Reached!**\n\nYou've used all your free commands. Please verify to get 3 more commands or upgrade to Premium for unlimited access!",
                 reply_markup=buttons
             )
             return
@@ -179,7 +169,8 @@ async def keyboard_popular_handler(client: Client, message: Message):
         # Check command limit first
         needs_verification, remaining = await check_command_limit(user_id)
 
-        if needs_verification or remaining <= 0:
+        # Only show verification dialog if user actually needs verification AND has no remaining commands
+        if needs_verification and remaining <= 0:
             # Create verification button
             buttons = InlineKeyboardMarkup([
                 [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
@@ -197,39 +188,20 @@ async def keyboard_popular_handler(client: Client, message: Message):
             )
             return
 
-        # Try to use command
+        # Try to use command (this will handle admin/premium logic internally)
         if not await use_command(user_id):
             buttons = InlineKeyboardMarkup([
                 [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
                 [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")]
             ])
-
             await message.reply_text(
-                f"⚠️ **Command Limit Reached!**\n\n"
-                f"You've used all your free commands (3/3).\n\n"
-                f"🔓 **Get instant access by:**\n"
-                f"• Getting a verification token (with ads)\n"
-                f"• Upgrading to Premium (no ads)\n\n"
-                f"💡 Premium users get unlimited access without verification!",
+                "🔐 **Command Limit Reached!**\n\nYou've used all your free commands. Please verify to get 3 more commands or upgrade to Premium for unlimited access!",
                 reply_markup=buttons
             )
             return
 
-        # Create a mock callback query to reuse existing popular files function
-        from pyrogram.types import CallbackQuery
-
-        # Create a temporary callback-like object
-        class MockCallback:
-            def __init__(self, message):
-                self.message = message
-                self.from_user = message.from_user
-                self.data = "rand_popular"
-
-            async def answer(self, text="", show_alert=False):
-                pass  # Mock method
-
-        mock_callback = MockCallback(message)
-        await show_popular_files(client, mock_callback)
+        # Call handle_popular_files_direct directly
+        await handle_popular_files_direct(client, message, is_callback=False)
 
     except Exception as e:
         print(f"ERROR in keyboard_popular_handler: {e}")
