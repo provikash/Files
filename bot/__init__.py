@@ -80,7 +80,7 @@ class Bot(Client):
         print(ascii_art)
         await asyncio.sleep(1.5)
         self.log(__name__).info(f"Bot Running..!\n\nCreated by \nhttps://t.me/ps_updates")
-        print("""Welcome to File Sharing Bot""")
+        print("""Welcome to Mother Bot - File Sharing System""")
 
         await schedule_manager.start()
         asyncio.create_task(schedule_manager.recover_pending_tasks())
