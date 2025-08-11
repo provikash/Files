@@ -32,6 +32,12 @@ async def admin_help(client: Client, message: Message):
 • `/removerequest <channel_id>` - Remove request approval channel
 • `/listrequest` - List all request channels
 
+**🔗 File Management:**
+• `/genlink` - Generate single file link
+• `/batch` - Generate batch file links
+• `/link` - Generate link for specific file
+• `/indexchannel` - Index a channel for file storage
+
 **🔗 Shortlink Configuration:**
 • `/setshortlink <api_key> <url>` - Configure shortlink API
 • `/shortlinkinfo` - View current shortlink settings
@@ -45,6 +51,7 @@ async def admin_help(client: Client, message: Message):
 • `/stats` - Bot statistics
 • `/users` - User count
 • `/testadmin` - Test admin access
+• `/debug` - Debug bot status and message info
 
 **📢 Communication:**
 • `/broadcast <message>` - Broadcast to all users
@@ -53,12 +60,16 @@ async def admin_help(client: Client, message: Message):
 • `/approveuser <user_id> <channel_id>` - Approve join request
 • `/pendingrequests` - View pending requests
 
+**🛠️ Development & Debug:**
+• `/debug` - Debug information and message analysis
+
 **Plans:** basic, standard, premium, unlimited
 
 **Examples:** 
 `/addforce -1001234567890`
 `/setshortlink your_api_key teraboxlinks.com`
 `/addpremium 1420372797 basic`
+`/broadcast Hello everyone! New update available.`
     """
     await message.reply_text(help_text)
 

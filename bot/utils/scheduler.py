@@ -1,4 +1,3 @@
-
 # Adapted from: https://github.com/zawsq/Teleshare/blob/main/bot/utilities/schedule_manager.py
 # Modified & extended by: @Mak0912 (TG)
 
@@ -32,14 +31,14 @@ class ScheduleManager:
         try:
             from bot.database.auto_delete_db import get_all_delete_tasks
             pending_tasks = await get_all_delete_tasks()
-            
+
             if not pending_tasks:
                 print("DEBUG: No pending delete tasks found")
                 return
-            
+
             current_time = datetime.datetime.now(tz=tzlocal.get_localzone())
             recovered_count = 0
-            
+
             for task in pending_tasks:
                 try:
                     # Parse run_time
@@ -49,13 +48,13 @@ class ScheduleManager:
                             run_time = run_time.replace(tzinfo=tzlocal.get_localzone())
                     else:
                         run_time = task['run_time']
-                    
+
                     # If task time has passed, skip it
                     if run_time <= current_time:
                         from bot.database.auto_delete_db import delete_saved_task
                         await delete_saved_task(task['_id'])
                         continue
-                    
+
                     # Re-schedule the task
                     self.scheduler.add_job(
                         func=self.delete_messages,
@@ -67,13 +66,13 @@ class ScheduleManager:
                         replace_existing=True
                     )
                     recovered_count += 1
-                    
+
                 except Exception as e:
                     print(f"ERROR recovering task {task.get('_id', 'unknown')}: {e}")
                     continue
-            
+
             print(f"DEBUG: Recovered {recovered_count} pending delete tasks")
-            
+
         except Exception as e:
             print(f"ERROR in recover_pending_tasks: {e}")
 
@@ -83,7 +82,7 @@ class ScheduleManager:
             if client is None:
                 from main import app
                 client = app
-            
+
             chunk_size = 100
             chunked_ids = [message_ids[i:i+chunk_size] for i in range(0, len(message_ids), chunk_size)]
             deleted_count = 0
@@ -103,20 +102,20 @@ class ScheduleManager:
                 retrieve_button = InlineKeyboardMarkup([
                     [InlineKeyboardButton("🗂 Retrieve Deleted File(s)", url=f"https://t.me/{client.me.username}?start={base64_file_link}")]
                 ])
-                
+
                 success_msg = getattr(Config, 'AUTO_DEL_SUCCESS_MSG', f"✅ Successfully deleted {deleted_count} files. Click below to retrieve them again.")
-                
+
                 await client.send_message(
                     chat_id=chat_id,
                     text=success_msg,
                     reply_markup=retrieve_button,
                 )
                 print(f"DEBUG: Auto-delete completed for {deleted_count} messages")
-            
+
             if task_id:
                 from bot.database.auto_delete_db import delete_saved_task
                 await delete_saved_task(task_id)
-                
+
         except Exception as e:
             print(f"ERROR in delete_messages: {e}")
             import traceback
@@ -126,7 +125,7 @@ class ScheduleManager:
         try:
             run_time = datetime.datetime.now(tz=tzlocal.get_localzone()) + datetime.timedelta(seconds=delete_n_seconds)
             task_id = f"{chat_id}_{message_ids[0]}_{datetime.datetime.utcnow().timestamp()}"
-            
+
             # Save task to database
             from bot.database.auto_delete_db import save_delete_task
             await save_delete_task(
@@ -136,7 +135,7 @@ class ScheduleManager:
                 run_time=run_time,
                 task_id=task_id
             )
-            
+
             # Schedule the deletion job
             self.scheduler.add_job(
                 func=self.delete_messages,
@@ -147,9 +146,9 @@ class ScheduleManager:
                 misfire_grace_time=60,
                 replace_existing=True
             )
-            
+
             print(f"DEBUG: Scheduled auto-delete for {len(message_ids)} messages in {delete_n_seconds} seconds")
-            
+
         except Exception as e:
             print(f"ERROR in schedule_delete: {e}")
             import traceback
