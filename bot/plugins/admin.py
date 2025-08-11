@@ -502,3 +502,68 @@ async def pending_requests(client: Client, message: Message):
             pending_text += f"**Channel {channel_id}:** Error accessing - {str(e)}\n\n"
     
     await message.reply_text(pending_text)
+
+@Client.on_message(filters.command("link") & filters.private)
+@admin_only
+async def generate_link_command(client: Client, message: Message):
+    """Generate link for a specific file - alias for genlink"""
+    await message.reply_text("Please use `/genlink` command to generate file links.")
+
+@Client.on_message(filters.command("indexchannel") & filters.private)
+@admin_only
+async def index_channel_command(client: Client, message: Message):
+    """Index a channel by providing channel link or forwarding message"""
+    help_text = """
+📋 **Index Channel Instructions:**
+
+**Method 1:** Forward any message from the channel you want to index
+**Method 2:** Send a channel link in this format:
+`https://t.me/channel_name/message_id`
+
+The bot will automatically detect and start indexing process.
+
+**Requirements:**
+• Bot must be admin in the target channel
+• Use `/setskip <number>` to set skip messages (optional)
+    """
+    await message.reply_text(help_text)
+
+@Client.on_message(filters.command("debug") & filters.private)
+@admin_only
+async def debug_command(client: Client, message: Message):
+    """Debug command to check bot status and configuration"""
+    if message.reply_to_message:
+        msg = message.reply_to_message
+        debug_info = f"**Message Debug Info:**\n\n"
+        debug_info += f"Message ID: {msg.id}\n"
+        debug_info += f"Is Forwarded: {bool(msg.forward_from_chat)}\n"
+        if msg.forward_from_chat:
+            debug_info += f"Forward From: {msg.forward_from_chat.title or msg.forward_from_chat.username}\n"
+            debug_info += f"Forward From ID: {msg.forward_from_chat.id}\n"
+            debug_info += f"Forward From Type: {msg.forward_from_chat.type}\n"
+        debug_info += f"Has Media: {bool(msg.media)}\n"
+        debug_info += f"Media Type: {msg.media if msg.media else 'None'}\n"
+        debug_info += f"Text: {msg.text[:100] if msg.text else 'None'}\n"
+        debug_info += f"Caption: {msg.caption[:100] if msg.caption else 'None'}\n"
+        await message.reply_text(debug_info)
+    else:
+        # General bot debug info
+        from bot.database import get_users_count
+        total_users = await get_users_count()
+        
+        debug_info = f"""
+🔧 **Bot Debug Information**
+
+**Database Status:** Connected ✅
+**Total Users:** {total_users}
+**Force Sub Channels:** {len(Config.FORCE_SUB_CHANNEL)}
+**Request Channels:** {len(getattr(Config, 'REQUEST_CHANNEL', []))}
+**Auto Delete:** {'Enabled' if Config.AUTO_DELETE_TIME > 0 else 'Disabled'}
+**Verify Mode:** {'Enabled' if Config.VERIFY_MODE else 'Disabled'}
+
+**Bot Username:** @{client.me.username if hasattr(client, 'me') and client.me else 'Unknown'}
+**Bot ID:** {client.me.id if hasattr(client, 'me') and client.me else 'Unknown'}
+
+Reply to a message to debug specific message properties.
+        """
+        await message.reply_text(debug_info)

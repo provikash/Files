@@ -137,18 +137,24 @@ async def send_for_index(bot, message):
     
     await message.reply('Thank you for the contribution! Wait for moderators to verify the files.')
 
-@Client.on_message(filters.command('setskip') & filters.user(Config.ADMINS))
+@Client.on_message(filters.command('setskip') & filters.private & filters.user(Config.ADMINS))
 async def set_skip_number(bot, message):
-    if ' ' in message.text:
-        _, skip = message.text.split(" ")
-        try:
-            skip = int(skip)
-        except:
-            return await message.reply("Skip number should be an integer.")
-        await message.reply(f"Successfully set SKIP number to {skip}")
-        temp.CURRENT = int(skip)
-    else:
-        await message.reply("Give me a skip number")
+    """Set skip number for indexing"""
+    if len(message.command) < 2:
+        return await message.reply_text("❌ Usage: `/setskip <number>`\nExample: `/setskip 100`")
+    
+    try:
+        skip_num = int(message.command[1])
+        if skip_num < 0:
+            return await message.reply_text("❌ Skip number must be a positive integer.")
+        
+        temp.CURRENT = skip_num
+        await message.reply_text(f"✅ Successfully set SKIP number to **{skip_num}**\n\nThis means indexing will start from message {skip_num} from the latest message.")
+        
+    except ValueError:
+        await message.reply_text("❌ Invalid number. Please provide a valid integer.")
+    except Exception as e:
+        await message.reply_text(f"❌ Error setting skip number: {str(e)}")
 
 async def index_files_to_db(lst_msg_id, chat, msg, bot):
     total_files = 0

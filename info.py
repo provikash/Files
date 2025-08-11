@@ -28,7 +28,7 @@ class Config(object):
     # Validate required environment variables
     if not API_ID or not API_HASH or not BOT_TOKEN:
         raise ValueError("Missing required environment variables: API_ID, API_HASH, or BOT_TOKEN")
-    
+
     # Convert API_ID to int after validation
     API_ID = int(API_ID)
 
@@ -41,11 +41,11 @@ class Config(object):
     CHANNEL_ID = getenv("CHANNEL_ID")
     INDEX_CHANNEL_ID = getenv("INDEX_CHANNEL_ID")
     OWNER_ID = getenv("OWNER_ID")
-    
+
     # Validate and convert channel/owner IDs
     if not CHANNEL_ID or not INDEX_CHANNEL_ID or not OWNER_ID:
         raise ValueError("Missing required environment variables: CHANNEL_ID, INDEX_CHANNEL_ID, or OWNER_ID")
-    
+
     CHANNEL_ID = int(CHANNEL_ID)
     INDEX_CHANNEL_ID = int(INDEX_CHANNEL_ID)
     OWNER_ID = int(OWNER_ID)
@@ -56,7 +56,7 @@ class Config(object):
 
     # Force subscription (normal invite links)
     FORCE_SUB_CHANNEL = list(set(int(ch) for ch in getenv("FORCE_SUB_CHANNEL", "").split() if id_pattern.fullmatch(ch)))
-    
+
     # Request channels (admin approval required)
     REQUEST_CHANNEL = list(set(int(ch) for ch in getenv("REQUEST_CHANNEL", "").split() if id_pattern.fullmatch(ch)))
     JOIN_REQUEST_ENABLE = getenv("JOIN_REQUEST_ENABLED", "False").lower() in ("true", "1", "yes")
