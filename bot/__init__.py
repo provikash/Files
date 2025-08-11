@@ -17,7 +17,7 @@ ascii_art = """
 class Bot(Client):
     def __init__(self):
         super().__init__(
-            name="1528 user monthly",
+            name="PS-LinkVault",
             api_id=Config.API_ID,
             api_hash=Config.API_HASH,            
             plugins=dict(root="bot/plugins"),
