@@ -41,8 +41,12 @@ async def get_valid_post(client: Client, user_id: int, prompt_text: str) -> int:
     )
     return 0
 
-@Client.on_message(filters.private & filters.user(Config.ADMINS) & filters.command("batch"))
+@Client.on_message(filters.private & filters.command("batch"))
 async def batch_link_generator(client: Client, message: Message):
+    # Check if user is admin
+    if message.from_user.id not in Config.ADMINS and message.from_user.id != Config.OWNER_ID:
+        return await message.reply_text("❌ This command is only available to administrators.")
+
     user_id = message.from_user.id
 
     start_prompt = "📥 Forward the *first* message from the DB Channel (or send the link):"
@@ -66,8 +70,12 @@ async def batch_link_generator(client: Client, message: Message):
         reply_markup=button 
     )
 
-@Client.on_message(filters.private & filters.user(Config.ADMINS) & filters.command("genlink"))
+@Client.on_message(filters.private & filters.command("genlink"))
 async def single_link_generator(client: Client, message: Message):
+    # Check if user is admin
+    if message.from_user.id not in Config.ADMINS and message.from_user.id != Config.OWNER_ID:
+        return await message.reply_text("❌ This command is only available to administrators.")
+    
     user_id = message.from_user.id
 
     prompt = "📩 Forward the message from the DB Channel (or send the link):"

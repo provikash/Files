@@ -383,17 +383,39 @@ async def add_premium_user_cmd(client: Client, message: Message):
             return await message.reply_text("❌ Invalid plan. Available plans: basic, standard, premium, unlimited")
 
         plan_info = PREMIUM_PLANS[plan]
+        
+        # Show processing message
+        processing_msg = await message.reply_text("⏳ Adding premium membership...")
+        
         success = await add_premium_user(user_id, plan, plan_info["tokens"])
 
         if success:
-            await message.reply_text(f"✅ Successfully added premium membership for user {user_id}\n**Plan:** {plan}\n**Tokens:** {plan_info['tokens'] if plan_info['tokens'] != -1 else 'Unlimited'}")
+            await processing_msg.edit_text(f"✅ Successfully added premium membership for user {user_id}\n**Plan:** {plan}\n**Tokens:** {plan_info['tokens'] if plan_info['tokens'] != -1 else 'Unlimited'}")
+            
+            # Try to notify the user
+            try:
+                await client.send_message(
+                    user_id,
+                    f"🎉 **Congratulations!**\n\n"
+                    f"✨ You have been upgraded to **{plan.title()} Premium**\n"
+                    f"🎯 **Tokens:** {plan_info['tokens'] if plan_info['tokens'] != -1 else 'Unlimited'}\n\n"
+                    f"🎯 **Benefits:**\n"
+                    f"• 🚫 No Ads\n"
+                    f"• ⚡ Instant Access\n"
+                    f"• 🔥 Unlimited Downloads"
+                )
+            except Exception as notify_error:
+                await message.reply_text(f"✅ Premium added but couldn't notify user: {notify_error}")
         else:
-            await message.reply_text("❌ Failed to add premium membership. User might already be premium.")
+            await processing_msg.edit_text("❌ Failed to add premium membership. Please check logs for details.")
 
     except ValueError:
         await message.reply_text("❌ Invalid user ID. Please provide a valid user ID.")
     except Exception as e:
         await message.reply_text(f"❌ Error adding premium user: {str(e)}")
+        print(f"Error in addpremium command: {e}")
+        import traceback
+        traceback.print_exc()
 
 @Client.on_message(filters.command("removepremium") & filters.private)
 @admin_only
@@ -527,21 +549,44 @@ async def payments_command(client: Client, message: Message):
     await message.reply_text(payment_text)
 
 @Client.on_message(filters.command("indexchannel") & filters.private)
-@admin_only
+@admin_only  
 async def index_channel_command(client: Client, message: Message):
-    """Index a channel by providing channel link or forwarding message"""
-    help_text = """
-📋 **Index Channel Instructions:**
+    """Index a channel by providing channel ID"""
+    if len(message.command) < 2:
+        help_text = """
+📋 **Index Channel Command:**
 
-**Method 1:** Forward any message from the channel you want to index
-**Method 2:** Send a channel link in this format:
-`https://t.me/channel_name/message_id`
+**Usage:** `/indexchannel <channel_id>`
+**Example:** `/indexchannel -1001234567890`
 
-**Example:** `https://t.me/example_channel/123`
+ℹ️ **Note:** 
+• The bot must be an admin in the channel
+• Use the channel ID (starts with -100)
+• This will set the channel as your file storage channel
+        """
+        return await message.reply_text(help_text)
 
-ℹ️ **Note:** The bot must be an admin in the channel to index files.
-    """
-    await message.reply_text(help_text)
+    try:
+        channel_id = int(message.command[1])
+        
+        # Test if bot can access the channel
+        try:
+            chat = await client.get_chat(channel_id)
+            channel_title = chat.title or f"Channel {channel_id}"
+        except Exception as e:
+            return await message.reply_text(f"❌ Cannot access channel {channel_id}. Make sure the bot is added as admin.\nError: {str(e)}")
+
+        # Update the bot's db_channel
+        try:
+            client.db_channel = chat
+            await message.reply_text(f"✅ Successfully indexed channel: **{channel_title}**\nChannel ID: `{channel_id}`\n\n🎯 This channel is now set as your file storage channel.")
+        except Exception as e:
+            await message.reply_text(f"❌ Error setting channel: {str(e)}")
+
+    except ValueError:
+        await message.reply_text("❌ Invalid channel ID. Please provide a valid channel ID starting with -100.")
+    except Exception as e:
+        await message.reply_text(f"❌ Error indexing channel: {str(e)}")
 
 @Client.on_message(filters.command("debug") & filters.private)
 @admin_only

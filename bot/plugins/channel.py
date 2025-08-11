@@ -74,8 +74,11 @@ async def auto_index_files(client: Client, message: Message):
         await reply_text.edit_text(f"❌ Error indexing file: {str(e)}")
         print(f"❌ Error indexing file: {e}")
 
-@Client.on_message(filters.private & filters.user(Config.ADMINS) & filters.command("link"))
+@Client.on_message(filters.private & filters.command("link"))
 async def create_link(client: Client, message: Message):
+    # Check if user is admin
+    if message.from_user.id not in Config.ADMINS and message.from_user.id != Config.OWNER_ID:
+        return await message.reply_text("❌ This command is only available to administrators.")
     """Create shareable link for files - requires /link command"""
     await message.reply_text("📎 Send the file you want to create a shareable link for:", quote=True)
 
