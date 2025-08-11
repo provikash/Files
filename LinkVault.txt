@@ -1038,3 +1038,17 @@ Created by
 https://t.me/ps_updates
 [11-Aug-25 12:41:16 - INFO] - apscheduler.scheduler - Scheduler started
 [11-Aug-25 12:41:17 - INFO] - apscheduler.scheduler - Added job "ScheduleManager.delete_messages" to job store "default"
+[11-Aug-25 12:44:12 - INFO] - root - Stop signal received (SIGTERM). Exiting...
+[11-Aug-25 12:44:12 - INFO] - bot - Bot stopped.
+[11-Aug-25 12:44:17 - INFO] - bot - Bot Running..!
+
+Created by 
+https://t.me/ps_updates
+[11-Aug-25 12:44:17 - INFO] - apscheduler.scheduler - Scheduler started
+[11-Aug-25 12:44:17 - INFO] - apscheduler.scheduler - Added job "ScheduleManager.delete_messages" to job store "default"
+[11-Aug-25 12:44:29 - INFO] - bot - Bot Running..!
+
+Created by 
+https://t.me/ps_updates
+[11-Aug-25 12:44:29 - INFO] - apscheduler.scheduler - Scheduler started
+[11-Aug-25 12:44:29 - INFO] - apscheduler.scheduler - Added job "ScheduleManager.delete_messages" to job store "default"
