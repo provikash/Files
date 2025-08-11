@@ -1062,3 +1062,12 @@ https://t.me/ps_updates
 [11-Aug-25 12:46:06 - INFO] - apscheduler.scheduler - Removed job 1861045099_2234_1754912166.571881
 [11-Aug-25 12:46:06 - INFO] - apscheduler.executors.default - Running job "ScheduleManager.delete_messages (trigger: date[2025-08-11 13:46:06 UTC+01:00], next run at: 2025-08-11 13:46:06 UTC+01:00)" (scheduled at 2025-08-11 13:46:06.571855+01:00)
 [11-Aug-25 12:46:06 - INFO] - apscheduler.executors.default - Job "ScheduleManager.delete_messages (trigger: date[2025-08-11 13:46:06 UTC+01:00], next run at: 2025-08-11 13:46:06 UTC+01:00)" executed successfully
+[11-Aug-25 12:51:35 - INFO] - root - Stop signal received (SIGTERM). Exiting...
+[11-Aug-25 12:51:35 - INFO] - bot - Bot stopped.
+[11-Aug-25 12:51:40 - INFO] - bot - Bot Running..!
+
+Created by 
+https://t.me/ps_updates
+[11-Aug-25 12:51:40 - INFO] - apscheduler.scheduler - Scheduler started
+[11-Aug-25 12:51:40 - INFO] - apscheduler.scheduler - Added job "ScheduleManager.delete_messages" to job store "default"
+[11-Aug-25 12:51:40 - INFO] - apscheduler.scheduler - Added job "ScheduleManager.delete_messages" to job store "default"
