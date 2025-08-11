@@ -83,7 +83,7 @@ class Bot(Client):
         print("""Welcome to File Sharing Bot""")
 
         await schedule_manager.start()
-        asyncio.create_task(schedule_manager.restore_pending_deletes(self))
+        asyncio.create_task(schedule_manager.recover_pending_tasks())
         
         if Config.WEB_MODE:
             from web import start_webserver
