@@ -1191,3 +1191,11 @@ Traceback (most recent call last):
   File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/errors/rpc_error.py", line 93, in raise_it
     raise getattr(
 pyrogram.errors.exceptions.bad_request_400.EntityBoundsInvalid: Telegram says: [400 ENTITY_BOUNDS_INVALID] (caused by "messages.SendMessage") Pyrogram 2.3.45 thinks: The message entity bounds are invalid
+[11-Aug-25 13:30:02 - INFO] - bot - Bot Running..!
+
+Created by 
+https://t.me/ps_updates
+[11-Aug-25 13:30:02 - INFO] - apscheduler.scheduler - Scheduler started
+[11-Aug-25 13:30:41 - INFO] - apscheduler.scheduler - Added job "ScheduleManager.delete_messages" to job store "default"
+[11-Aug-25 13:31:55 - INFO] - root - Stop signal received (SIGTERM). Exiting...
+[11-Aug-25 13:31:55 - INFO] - bot - Bot stopped.
