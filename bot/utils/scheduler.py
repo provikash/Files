@@ -80,8 +80,17 @@ class ScheduleManager:
         try:
             # Get client instance if not provided (for recovered tasks)
             if client is None:
-                from main import app
-                client = app
+                # Import here to avoid circular imports
+                import pyrogram
+                # Get the running client instance
+                for instance in pyrogram.Client.instances:
+                    if hasattr(instance, 'db_channel'):
+                        client = instance
+                        break
+
+                if client is None:
+                    print("ERROR: No active bot client found for scheduler")
+                    return
 
             chunk_size = 100
             chunked_ids = [message_ids[i:i+chunk_size] for i in range(0, len(message_ids), chunk_size)]
