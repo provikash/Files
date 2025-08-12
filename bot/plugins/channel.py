@@ -149,9 +149,7 @@ async def auto_index_media(client: Client, message: Message):
                     file_name = message.document.file_name
 
             # Use unique message ID for indexing
-            unique_file_id = f"{Config.INDEX_CHANNEL_ID}_{message.id}"
-
-            # Add to index
+            unique_file_id = f"{Config.INDEX_CHANNEL_ID}_{message.id}"fig.INDEX_CHAN# Add to index
             await add_to_index(
                 file_id=unique_file_id,
                 file_name=file_name,
@@ -199,6 +197,7 @@ async def handle_forwarded_files(client: Client, message: Message):
         return
 
     if message.forward_from_chat.type != enums.ChatType.CHANNEL:
+        return != enums.ChatType.CHANNEL:
         return
 
     forward_chat = message.forward_from_chat
@@ -325,6 +324,114 @@ async def index_channel_files(client: Client, message: Message, channel_id: int)
     errors = 0
     deleted = 0
     no_media = 0
+    unsupported = 0
+
+    try:
+        # Get channel info
+        channel = await client.get_chat(channel_id)
+        
+        # Start indexing from latest messages
+        current = 0
+        async for msg in client.get_chat_history(channel_id):
+            if temp.CANCEL:
+                await message.edit_text(
+                    f"❌ Indexing cancelled!\n\n"
+                    f"📊 **Statistics:**\n"
+                    f"• Files indexed: {total_files}\n"
+                    f"• Duplicates skipped: {duplicate_files}\n"
+                    f"• Deleted messages: {deleted}\n"
+                    f"• Non-media messages: {no_media}\n"
+                    f"• Errors: {errors}"
+                )
+                break
+
+            current += 1
+
+            # Update progress every 50 messages
+            if current % 50 == 0:
+                await message.edit_text(
+                    f"🔍 **Indexing in progress...**\n\n"
+                    f"📊 **Current Statistics:**\n"
+                    f"• Messages processed: {current}\n"
+                    f"• Files indexed: {total_files}\n"
+                    f"• Duplicates skipped: {duplicate_files}\n"
+                    f"• Non-media messages: {no_media}\n"
+                    f"• Errors: {errors}",
+                    reply_markup=InlineKeyboardMarkup([
+                        [InlineKeyboardButton("❌ Cancel", callback_data="index_cancel")]
+                    ])
+                )
+
+            if msg.empty:
+                deleted += 1
+                continue
+
+            if not msg.media:
+                no_media += 1
+                continue
+
+            # Only index video, document, photo, audio
+            if not (msg.video or msg.document or msg.photo or msg.audio):
+                unsupported += 1
+                continue
+
+            try:
+                # Determine file info
+                media_type = "unknown"
+                file_size = 0
+                file_name = msg.caption or f"File_{msg.id}"
+
+                if msg.video:
+                    media_type = "video"
+                    file_size = msg.video.file_size or 0
+                    if msg.video.file_name:
+                        file_name = msg.video.file_name
+                elif msg.document:
+                    media_type = "document"
+                    file_size = msg.document.file_size or 0
+                    if msg.document.file_name:
+                        file_name = msg.document.file_name
+                elif msg.photo:
+                    media_type = "photo"
+                    file_size = getattr(msg.photo, 'file_size', 0)
+                elif msg.audio:
+                    media_type = "audio"
+                    file_size = msg.audio.file_size or 0
+                    if msg.audio.file_name:
+                        file_name = msg.audio.file_name
+
+                # Create unique file ID
+                unique_file_id = f"{channel_id}_{msg.id}"
+
+                # Add to index
+                await add_to_index(
+                    file_id=unique_file_id,
+                    file_name=file_name,
+                    file_type=media_type,
+                    file_size=file_size,
+                    caption=msg.caption or '',
+                    user_id=msg.from_user.id if msg.from_user else 0
+                )
+
+                total_files += 1
+
+            except Exception as e:
+                print(f"Error indexing message {msg.id}: {e}")
+                errors += 1
+
+        # Final status
+        await message.edit_text(
+            f"✅ **Indexing completed!**\n\n"
+            f"📊 **Final Statistics:**\n"
+            f"• Messages processed: {current}\n"
+            f"• Files indexed: {total_files}\n"
+            f"• Duplicates skipped: {duplicate_files}\n"
+            f"• Deleted messages: {deleted}\n"
+            f"• Non-media messages: {no_media + unsupported}\n"
+            f"• Errors: {errors}"
+        )
+
+    except Excepta = 0
     unsupported = 0
     message_count = 0
     processed_files = set()
@@ -494,16 +601,62 @@ async def cancel_indexing(client: Client, query):
 
 @Client.on_message(filters.channel & filters.incoming & filters.chat(Config.CHANNEL_ID))
 async def new_post(client: Client, message: Message):
-    if Config.DISABLE_CHANNEL_BUTTON:
-        return
+    """Handle new posts in the main storage channel"""
+    
+    # Auto-index media files from the main storage channel
+    if message.video or message.document or message.photo or message.audio:
+        try:
+            # Determine media type and file info
+            media_type = "unknown"
+            file_size = 0
+            file_name = message.caption or f"File_{message.id}"
 
-    converted_id = message.id * abs(client.db_channel.id)
-    string = f"get-{converted_id}"
-    base64_string = encode(string)
-    link = f"https://t.me/{client.username}?start={base64_string}"
-    reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("🔁 Share URL", url=f'https://telegram.me/share/url?url={link}')]])
-    try:
-        await message.edit_reply_markup(reply_markup)
+            if message.video:
+                media_type = "video"
+                file_size = message.video.file_size or 0
+                if message.video.file_name:
+                    file_name = message.video.file_name
+            elif message.document:
+                media_type = "document"
+                file_size = message.document.file_size or 0
+                if message.document.file_name:
+                    file_name = message.document.file_name
+            elif message.photo:
+                media_type = "photo"
+                file_size = getattr(message.photo, 'file_size', 0)
+            elif message.audio:
+                media_type = "audio"
+                file_size = message.audio.file_size or 0
+                if message.audio.file_name:
+                    file_name = message.audio.file_name
+
+            # Use unique message ID for indexing
+            unique_file_id = f"{Config.CHANNEL_ID}_{message.id}"
+
+            # Add to index
+            await add_to_index(
+                file_id=unique_file_id,
+                file_name=file_name,
+                file_type=media_type,
+                file_size=file_size,
+                caption=message.caption or '',
+                user_id=message.from_user.id if message.from_user else 0
+            )
+
+            print(f"✅ Auto-indexed {media_type} file {message.id} from main storage channel")
+
+        except Exception as e:
+            print(f"❌ Error auto-indexing from main channel: {e}")
+    
+    # Add share button if not disabled
+    if not Config.DISABLE_CHANNEL_BUTTON:
+        converted_id = message.id * abs(client.db_channel.id)
+        string = f"get-{converted_id}"
+        base64_string = encode(string)
+        link = f"https://t.me/{client.username}?start={base64_string}"
+        reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("🔁 Share URL", url=f'https://telegram.me/share/url?url={link}')]])
+        try:
+            await message.edit_reply_markup(reply_markup)
     except FloodWait as e:
         await asyncio.sleep(e.value)
         await message.edit_reply_markup(reply_markup)
