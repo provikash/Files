@@ -505,7 +505,7 @@ async def new_post(client: Client, message: Message):
         base64_string = encode(string)
         link = f"https://t.me/{client.username}?start={base64_string}"
         reply_markup = InlineKeyboardMarkup([[InlineKeyboardButton("🔁 Share URL", url=f'https://telegram.me/share/url?url={link}')]])
-        try:
+    try:
             await message.edit_reply_markup(reply_markup)
     except FloodWait as e:
         await asyncio.sleep(e.value)
