@@ -486,8 +486,8 @@ async def broadcast_message(client: Client, message: Message):
     try:
         broadcast_text = message.text.split(None, 1)[1]
 
-        from bot.database import get_all_users
-        users = await get_all_users()
+        from bot.database import full_userbase
+        users = await full_userbase()
 
         if not users:
             return await message.reply_text("❌ No users found in database.")
