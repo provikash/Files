@@ -109,7 +109,7 @@ async def handle_force_sub(client, message: Message):
             print(f"Error creating button for request channel {ch}: {e}")
 
     # Add "Try Again" button if payload is present
-    if hasattr(message, 'command') and len(message.command) > 1:
+    if hasattr(message, 'command') and message.command is not None and len(message.command) > 1:
         payload = message.command[1]
         if client.username:
             buttons.append([
