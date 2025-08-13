@@ -3,6 +3,7 @@ from pyrogram.types import Message, InlineKeyboardMarkup, InlineKeyboardButton
 from info import Config
 from bot.database import add_premium_user, remove_premium, get_users_count
 from bot.database.premium_db import get_all_premium_users
+from bot.plugins.premium import PREMIUM_PLANS
 import os
 import asyncio
 from dotenv import set_key, load_dotenv
@@ -196,6 +197,43 @@ async def add_request_channel(client: Client, message: Message):
 @admin_only
 async def remove_request_channel(client: Client, message: Message):
     """Remove request approval channel"""
+
+
+@Client.on_message(filters.command("checkpremium") & filters.private)
+@admin_only
+async def check_premium_status(client: Client, message: Message):
+    """Debug command to check premium status"""
+    if len(message.command) < 2:
+        return await message.reply_text("Usage: `/checkpremium <user_id>`")
+
+    try:
+        user_id = int(message.command[1])
+        
+        # Check if user is premium
+        is_premium = await is_premium_user(user_id)
+        
+        # Get premium info
+        from bot.database.premium_db import get_premium_info
+        premium_info = await get_premium_info(user_id)
+        
+        debug_text = f"🔍 **Premium Status Debug for User {user_id}**\n\n"
+        debug_text += f"**Is Premium:** {is_premium}\n"
+        
+        if premium_info:
+            debug_text += f"**Plan:** {premium_info.get('plan_type', 'Unknown')}\n"
+            debug_text += f"**Tokens:** {premium_info.get('tokens_remaining', 'Unknown')}\n"
+            debug_text += f"**Active:** {premium_info.get('is_active', 'Unknown')}\n"
+            debug_text += f"**Expiry:** {premium_info.get('expiry_date', 'Unknown')}\n"
+        else:
+            debug_text += "**Premium Info:** None found in database"
+        
+        await message.reply_text(debug_text)
+        
+    except ValueError:
+        await message.reply_text("❌ Invalid user ID!")
+    except Exception as e:
+        await message.reply_text(f"❌ Error: {e}")
+
     if len(message.command) < 2:
         return await message.reply_text("❌ Usage: `/removerequest <channel_id>`")
 
@@ -387,7 +425,7 @@ async def add_premium_user_cmd(client: Client, message: Message):
         # Show processing message
         processing_msg = await message.reply_text("⏳ Adding premium membership...")
         
-        success = await add_premium_user(user_id, plan, plan_info["tokens"])
+        success = await add_premium_user(user_id, plan_info["name"], plan_info["tokens"])
 
         if success:
             await processing_msg.edit_text(f"✅ Successfully added premium membership for user {user_id}\n**Plan:** {plan}\n**Tokens:** {plan_info['tokens'] if plan_info['tokens'] != -1 else 'Unlimited'}")

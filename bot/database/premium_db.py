@@ -14,7 +14,9 @@ async def add_premium_user(user_id: int, plan_type: str, tokens: int):
             'plan_type': plan_type,
             'tokens_remaining': tokens,  # -1 for unlimited
             'expiry_date': expiry_date,
-            'created_at': datetime.utcnow()
+            'created_at': datetime.utcnow(),
+            'is_active': True,
+            'start_date': datetime.utcnow()
         }
 
         # Use upsert to avoid duplicate key errors
@@ -40,14 +42,20 @@ async def is_premium_user(user_id: int) -> bool:
         return False
 
     try:
-        # Check if required fields exist
-        if 'tokens_remaining' not in user or 'is_active' not in user:
-            # Data is corrupted, deactivate and return False
+        # Set default values for missing fields
+        if 'is_active' not in user:
+            user['is_active'] = True
             await premium_data.update_one(
                 {'_id': user_id}, 
-                {'$set': {'is_active': False}}
+                {'$set': {'is_active': True}}
             )
-            return False
+        
+        if 'tokens_remaining' not in user:
+            user['tokens_remaining'] = 0
+            await premium_data.update_one(
+                {'_id': user_id}, 
+                {'$set': {'tokens_remaining': 0}}
+            )
 
         if not user['is_active']:
             return False
