@@ -1295,3 +1295,10 @@ TypeError: object of type 'NoneType' has no len()
 Created by 
 https://t.me/ps_updates
 [13-Aug-25 02:54:18 - INFO] - apscheduler.scheduler - Scheduler started
+[13-Aug-25 02:58:07 - INFO] - root - Stop signal received (SIGTERM). Exiting...
+[13-Aug-25 02:58:07 - INFO] - bot - Bot stopped.
+[13-Aug-25 02:58:12 - INFO] - bot - Bot Running..!
+
+Created by 
+https://t.me/ps_updates
+[13-Aug-25 02:58:12 - INFO] - apscheduler.scheduler - Scheduler started
