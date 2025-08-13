@@ -149,7 +149,7 @@ async def auto_index_media(client: Client, message: Message):
                     file_name = message.document.file_name
 
             # Use unique message ID for indexing
-            unique_file_id = f"{Config.INDEX_CHANNEL_ID}_{message.id}"fig.INDEX_CHAN# Add to index
+            unique_file_id = f"{Config.INDEX_CHANNEL_ID}_{message.id}"  # Add to index
             await add_to_index(
                 file_id=unique_file_id,
                 file_name=file_name,
