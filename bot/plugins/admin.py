@@ -411,10 +411,10 @@ async def add_premium_user_cmd(client: Client, message: Message):
         plan = message.command[2].lower()
 
         PREMIUM_PLANS = {
-            "basic": {"tokens": 50, "price": "29"},
-            "standard": {"tokens": 150, "price": "79"},
-            "premium": {"tokens": 300, "price": "149"},
-            "unlimited": {"tokens": -1, "price": "299"}
+            "basic": {"name": "Basic Token Pack", "tokens": 50, "price": "29"},
+            "standard": {"name": "Standard Token Pack", "tokens": 150, "price": "79"},
+            "premium": {"name": "Premium Token Pack", "tokens": 300, "price": "149"},
+            "unlimited": {"name": "Unlimited Access", "tokens": -1, "price": "299"}
         }
 
         if plan not in PREMIUM_PLANS:
