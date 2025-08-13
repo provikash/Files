@@ -149,10 +149,9 @@ async def start_handler(client: Client, message: Message):
         # Start Message / No Params
         # Only show buttons if force subscription is not active
         buttons = InlineKeyboardMarkup([
-            [
-                InlineKeyboardButton("🎲 Random Files", callback_data="execute_rand"),
-                InlineKeyboardButton("💎 Premium Plans", callback_data="show_premium_plans")
-            ],
+            [InlineKeyboardButton("🔗 Generate Link", callback_data="genlink")],
+            [InlineKeyboardButton("📊 My Stats", callback_data="my_stats")],
+            [InlineKeyboardButton("🎲 Random Files", callback_data="execute_rand"), InlineKeyboardButton("💎 Premium Plans", callback_data="show_premium_plans")],
             [
                 InlineKeyboardButton("😊 About", callback_data="about"),
                 InlineKeyboardButton("🔒 Close", callback_data="close")

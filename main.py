@@ -11,25 +11,15 @@ uvloop.install()
 
 async def main():
     try:
-        # Start the mother bot
-        print("🚀 Starting Mother Bot...")
+        # Start the bot
+        print("🚀 Starting File Sharing Bot...")
         app = Bot()
         await app.start()
-        print("✅ Mother Bot started successfully!")
-        
-        # Initialize clone manager
-        try:
-            from clone_manager import clone_manager
-            await clone_manager.start_all_clones()
-            print("✅ Clone manager initialized")
-        except ImportError:
-            print("ℹ️ Clone manager not available")
-        except Exception as e:
-            print(f"⚠️ Clone manager error: {e}")
-        
+        print("✅ File Sharing Bot started successfully!")
+
         print("🎉 All systems operational! Bot is ready to serve users.")
         await idle()
-        
+
     except KeyboardInterrupt:
         print("🛑 Bot shutdown requested by user")
     except Exception as critical_error:
@@ -49,4 +39,4 @@ if __name__ == "__main__":
         asyncio.run(main())
     except Exception as startup_error:
         print(f"💥 STARTUP FAILURE: {startup_error}")
-        print("🔄 Please restart the bot using /start command in Telegram")
+        print("ℹ️ Please check the logs for more details.")

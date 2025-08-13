@@ -537,13 +537,13 @@ async def error_callback_handler(client, query: CallbackQuery):
     """Catch-all callback handler for unhandled callbacks with error handling"""
     try:
         print(f"DEBUG: Unhandled callback received: '{query.data}' from user {query.from_user.id}")
-        
+
         # Handle unknown callbacks gracefully
         await query.answer(
             "❌ Unknown action! Please use /start command to restart the bot.",
             show_alert=True
         )
-        
+
         # Provide restart option
         try:
             await query.edit_message_text(
