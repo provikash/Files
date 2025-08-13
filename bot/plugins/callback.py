@@ -531,11 +531,41 @@ async def buy_premium_callback(client, query: CallbackQuery):
         print(f"Error in buy_premium_callback: {e}")
         await query.answer("❌ Error processing request. Please try again.", show_alert=True)
 
-# Debug callback handler to catch any unhandled callbacks
+# Error handler for unhandled callbacks
 @Client.on_callback_query()
-async def debug_callback_handler(client, query: CallbackQuery):
-    """Catch-all callback handler for debugging unhandled callbacks"""
-    print(f"DEBUG: Unhandled callback received: '{query.data}' from user {query.from_user.id}")
-
-    # Let other handlers process first by not answering immediately
-    # This is just for debugging purposes
+async def error_callback_handler(client, query: CallbackQuery):
+    """Catch-all callback handler for unhandled callbacks with error handling"""
+    try:
+        print(f"DEBUG: Unhandled callback received: '{query.data}' from user {query.from_user.id}")
+        
+        # Handle unknown callbacks gracefully
+        await query.answer(
+            "❌ Unknown action! Please use /start command to restart the bot.",
+            show_alert=True
+        )
+        
+        # Provide restart option
+        try:
+            await query.edit_message_text(
+                "❌ **Something went wrong!**\n\n"
+                "🔄 Please send /start command to use the bot properly.",
+                reply_markup=InlineKeyboardMarkup([
+                    [InlineKeyboardButton("🔄 Send /start", url=f"https://t.me/{client.username}?start=")]
+                ])
+            )
+        except:
+            # If edit fails, send new message
+            await client.send_message(
+                query.from_user.id,
+                "❌ **Error occurred!**\n\n"
+                "🔄 Please send /start command to restart the bot.",
+                reply_markup=InlineKeyboardMarkup([
+                    [InlineKeyboardButton("🔄 Send /start", url=f"https://t.me/{client.username}?start=")]
+                ])
+            )
+    except Exception as e:
+        print(f"ERROR in error_callback_handler: {e}")
+        try:
+            await query.answer("❌ Critical error! Send /start to restart.", show_alert=True)
+        except:
+            pass

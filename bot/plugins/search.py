@@ -25,10 +25,19 @@ async def random_command(client: Client, message: Message):
             needs_verification, remaining = await check_command_limit(user_id)
 
             # Create verification button
-            buttons = InlineKeyboardMarkup([
-                [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
-                [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")]
-            ])
+            try:
+                buttons = InlineKeyboardMarkup([
+                    [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
+                    [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")],
+                    [InlineKeyboardButton("🔄 Send /start", url=f"https://t.me/{client.username}?start=")]
+                ])
+            except Exception as e:
+                print(f"ERROR creating buttons: {e}")
+                await message.reply_text(
+                    "❌ **Error occurred!**\n\n"
+                    "🔄 Please send /start command to restart the bot."
+                )
+                return
 
             await message.reply_text(
                 f"⚠️ **Command Limit Reached!**\n\n"
@@ -66,10 +75,19 @@ async def keyboard_random_handler(client: Client, message: Message):
         # Only show verification dialog if user actually needs verification AND has no remaining commands
         if needs_verification and remaining <= 0:
             # Create verification button
-            buttons = InlineKeyboardMarkup([
-                [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
-                [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")]
-            ])
+            try:
+                buttons = InlineKeyboardMarkup([
+                    [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
+                    [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")],
+                    [InlineKeyboardButton("🔄 Send /start", url=f"https://t.me/{client.username}?start=")]
+                ])
+            except Exception as e:
+                print(f"ERROR creating buttons: {e}")
+                await message.reply_text(
+                    "❌ **Error occurred!**\n\n"
+                    "🔄 Please send /start command to restart the bot."
+                )
+                return
 
             await message.reply_text(
                 f"⚠️ **Command Limit Reached!**\n\n"
@@ -84,10 +102,19 @@ async def keyboard_random_handler(client: Client, message: Message):
 
         # Try to use command (this will handle admin/premium logic internally)
         if not await use_command(user_id):
-            buttons = InlineKeyboardMarkup([
-                [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
-                [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")]
-            ])
+            try:
+                buttons = InlineKeyboardMarkup([
+                    [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
+                    [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")],
+                    [InlineKeyboardButton("🔄 Send /start", url=f"https://t.me/{client.username}?start=")]
+                ])
+            except Exception as e:
+                print(f"ERROR creating buttons: {e}")
+                await message.reply_text(
+                    "❌ **Error occurred!**\n\n"
+                    "🔄 Please send /start command to restart the bot."
+                )
+                return
             await message.reply_text(
                 "🔐 **Command Limit Reached!**\n\nYou've used all your free commands. Please verify to get 3 more commands or upgrade to Premium for unlimited access!",
                 reply_markup=buttons
@@ -119,10 +146,19 @@ async def keyboard_recent_handler(client: Client, message: Message):
         # Only show verification dialog if user actually needs verification AND has no remaining commands
         if needs_verification and remaining <= 0:
             # Create verification button
-            buttons = InlineKeyboardMarkup([
-                [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
-                [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")]
-            ])
+            try:
+                buttons = InlineKeyboardMarkup([
+                    [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
+                    [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")],
+                    [InlineKeyboardButton("🔄 Send /start", url=f"https://t.me/{client.username}?start=")]
+                ])
+            except Exception as e:
+                print(f"ERROR creating buttons: {e}")
+                await message.reply_text(
+                    "❌ **Error occurred!**\n\n"
+                    "🔄 Please send /start command to restart the bot."
+                )
+                return
 
             await message.reply_text(
                 f"⚠️ **Command Limit Reached!**\n\n"
@@ -137,10 +173,19 @@ async def keyboard_recent_handler(client: Client, message: Message):
 
         # Try to use command (this will handle admin/premium logic internally)
         if not await use_command(user_id):
-            buttons = InlineKeyboardMarkup([
-                [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
-                [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")]
-            ])
+            try:
+                buttons = InlineKeyboardMarkup([
+                    [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
+                    [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")],
+                    [InlineKeyboardButton("🔄 Send /start", url=f"https://t.me/{client.username}?start=")]
+                ])
+            except Exception as e:
+                print(f"ERROR creating buttons: {e}")
+                await message.reply_text(
+                    "❌ **Error occurred!**\n\n"
+                    "🔄 Please send /start command to restart the bot."
+                )
+                return
             await message.reply_text(
                 "🔐 **Command Limit Reached!**\n\nYou've used all your free commands. Please verify to get 3 more commands or upgrade to Premium for unlimited access!",
                 reply_markup=buttons
@@ -172,10 +217,19 @@ async def keyboard_popular_handler(client: Client, message: Message):
         # Only show verification dialog if user actually needs verification AND has no remaining commands
         if needs_verification and remaining <= 0:
             # Create verification button
-            buttons = InlineKeyboardMarkup([
-                [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
-                [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")]
-            ])
+            try:
+                buttons = InlineKeyboardMarkup([
+                    [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
+                    [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")],
+                    [InlineKeyboardButton("🔄 Send /start", url=f"https://t.me/{client.username}?start=")]
+                ])
+            except Exception as e:
+                print(f"ERROR creating buttons: {e}")
+                await message.reply_text(
+                    "❌ **Error occurred!**\n\n"
+                    "🔄 Please send /start command to restart the bot."
+                )
+                return
 
             await message.reply_text(
                 f"⚠️ **Command Limit Reached!**\n\n"
@@ -190,10 +244,19 @@ async def keyboard_popular_handler(client: Client, message: Message):
 
         # Try to use command (this will handle admin/premium logic internally)
         if not await use_command(user_id):
-            buttons = InlineKeyboardMarkup([
-                [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
-                [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")]
-            ])
+            try:
+                buttons = InlineKeyboardMarkup([
+                    [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
+                    [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")],
+                    [InlineKeyboardButton("🔄 Send /start", url=f"https://t.me/{client.username}?start=")]
+                ])
+            except Exception as e:
+                print(f"ERROR creating buttons: {e}")
+                await message.reply_text(
+                    "❌ **Error occurred!**\n\n"
+                    "🔄 Please send /start command to restart the bot."
+                )
+                return
             await message.reply_text(
                 "🔐 **Command Limit Reached!**\n\nYou've used all your free commands. Please verify to get 3 more commands or upgrade to Premium for unlimited access!",
                 reply_markup=buttons
@@ -224,10 +287,19 @@ async def keyboard_random_handler_sync(client: Client, message: Message):
         needs_verification, remaining = await check_command_limit(user_id)
 
         if needs_verification:
-            buttons = [
-                [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
-                [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")]
-            ]
+            try:
+                buttons = [
+                    [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
+                    [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")],
+                    [InlineKeyboardButton("🔄 Send /start", url=f"https://t.me/{client.username}?start=")]
+                ]
+            except Exception as e:
+                print(f"ERROR creating buttons: {e}")
+                await message.reply_text(
+                    "❌ **Error occurred!**\n\n"
+                    "🔄 Please send /start command to restart the bot."
+                )
+                return
             await message.reply_text(
                 "🔐 **Verification Required!**\n\nYou need to verify your account to continue. Get a verification token to access 3 more commands!",
                 reply_markup=InlineKeyboardMarkup(buttons)
@@ -236,10 +308,19 @@ async def keyboard_random_handler_sync(client: Client, message: Message):
 
         # Try to use command
         if not await use_command(user_id):
-            buttons = [
-                [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
-                [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")]
-            ]
+            try:
+                buttons = [
+                    [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
+                    [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")],
+                    [InlineKeyboardButton("🔄 Send /start", url=f"https://t.me/{client.username}?start=")]
+                ]
+            except Exception as e:
+                print(f"ERROR creating buttons: {e}")
+                await message.reply_text(
+                    "❌ **Error occurred!**\n\n"
+                    "🔄 Please send /start command to restart the bot."
+                )
+                return
             await message.reply_text(
                 "🔐 **Command Limit Reached!**\n\nYou've used all your free commands. Please verify to get 3 more commands or upgrade to Premium for unlimited access!",
                 reply_markup=InlineKeyboardMarkup(buttons)
@@ -400,7 +481,7 @@ async def handle_random_files(client: Client, message, is_callback: bool = False
 
                 if not file_id:
                     print(f"ERROR: No file_id found for file: {file_name}")
-                    errors_encountered.append(f"Missing file_id for {file_name}")
+                    errors_encountered.append(f"Missing file_id for: {file_name}")
                     continue
 
                 print(f"DEBUG: Processing file: {file_name} with ID: {file_id}, Type: {file_type}")
@@ -792,7 +873,7 @@ async def handle_recent_files_direct(client: Client, message, is_callback: bool 
 
                 if not file_id:
                     print(f"ERROR: No file_id found for file: {file_name}")
-                    errors_encountered.append(f"Missing file_id for {file_name}")
+                    errors_encountered.append(f"Missing file_id for: {file_name}")
                     continue
 
                 print(f"DEBUG: Processing recent file: {file_name} with ID: {file_id}, Type: {file_type}")
@@ -1059,7 +1140,7 @@ async def handle_popular_files_direct(client: Client, message: Message, is_callb
 
                 if not file_id:
                     print(f"ERROR: No file_id found for file: {file_name}")
-                    errors_encountered.append(f"Missing file_id for {file_name}")
+                    errors_encountered.append(f"Missing file_id for: {file_name}")
                     continue
 
                 print(f"DEBUG: Processing popular file: {file_name} with ID: {file_id}, Type: {file_type}, Views: {access_count}")
@@ -1282,10 +1363,19 @@ async def popular_files_command(client: Client, message: Message):
             needs_verification, remaining = await check_command_limit(user_id)
 
             # Create verification button
-            buttons = InlineKeyboardMarkup([
-                [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
-                [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")]
-            ])
+            try:
+                buttons = InlineKeyboardMarkup([
+                    [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
+                    [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")],
+                    [InlineKeyboardButton("🔄 Send /start", url=f"https://t.me/{client.username}?start=")]
+                ])
+            except Exception as e:
+                print(f"ERROR creating buttons: {e}")
+                await message.reply_text(
+                    "❌ **Error occurred!**\n\n"
+                    "🔄 Please send /start command to restart the bot."
+                )
+                return
 
             await message.reply_text(
                 f"⚠️ **Command Limit Reached!**\n\n"
@@ -1319,10 +1409,19 @@ async def recent_files_command(client: Client, message: Message):
             needs_verification, remaining = await check_command_limit(user_id)
 
             # Create verification button
-            buttons = InlineKeyboardMarkup([
-                [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
-                [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")]
-            ])
+            try:
+                buttons = InlineKeyboardMarkup([
+                    [InlineKeyboardButton("🔐 Get Access Token", callback_data="get_token")],
+                    [InlineKeyboardButton("💎 Remove Ads - Buy Premium", callback_data="show_premium_plans")],
+                    [InlineKeyboardButton("🔄 Send /start", url=f"https://t.me/{client.username}?start=")]
+                ])
+            except Exception as e:
+                print(f"ERROR creating buttons: {e}")
+                await message.reply_text(
+                    "❌ **Error occurred!**\n\n"
+                    "🔄 Please send /start command to restart the bot."
+                )
+                return
 
             await message.reply_text(
                 f"⚠️ **Command Limit Reached!**\n\n"

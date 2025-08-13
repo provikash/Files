@@ -199,44 +199,61 @@ async def start_handler(client: Client, message: Message):
 
 @Client.on_message(filters.private & filters.text & ~filters.command(['start', 'token', 'rand']) & ~filters.regex(r"^(🎲 Random Files|💎 Premium Plans)$"))
 async def handle_useless_messages(client: Client, message: Message):
-    """Handle any useless/random text messages with simplified synchronized keyboards"""
-    user = message.from_user
+    """Handle any useless/random text messages with comprehensive error handling"""
+    try:
+        user = message.from_user
+        if not user:
+            return
 
-    # Check force subscription first
-    if await handle_force_sub(client, message):
-        return
+        # Check force subscription first
+        if await handle_force_sub(client, message):
+            return
 
-    # Create simplified custom keyboard with only Random and Premium buttons
-    custom_keyboard = ReplyKeyboardMarkup([
-        [
-            KeyboardButton("🎲 Random Files"),
-            KeyboardButton("💎 Premium Plans")
-        ]
-    ], resize_keyboard=True, one_time_keyboard=False)
+        # Create simplified custom keyboard with only Random and Premium buttons
+        custom_keyboard = ReplyKeyboardMarkup([
+            [
+                KeyboardButton("🎲 Random Files"),
+                KeyboardButton("💎 Premium Plans")
+            ]
+        ], resize_keyboard=True, one_time_keyboard=False)
 
-    # Create inline buttons that match the custom keyboard functionality
-    inline_buttons = InlineKeyboardMarkup([
-        [
-            InlineKeyboardButton("🎲 Random Files", callback_data="execute_rand"),
-            InlineKeyboardButton("💎 Premium Plans", callback_data="show_premium_plans")
-        ],
-        [
-            InlineKeyboardButton("😊 About", callback_data="about"),
-            InlineKeyboardButton("🔒 Close", callback_data="close")
-        ]
-    ])
+        # Create inline buttons that match the custom keyboard functionality
+        inline_buttons = InlineKeyboardMarkup([
+            [
+                InlineKeyboardButton("🎲 Random Files", callback_data="execute_rand"),
+                InlineKeyboardButton("💎 Premium Plans", callback_data="show_premium_plans")
+            ],
+            [
+                InlineKeyboardButton("😊 About", callback_data="about"),
+                InlineKeyboardButton("🔒 Close", callback_data="close")
+            ]
+        ])
 
-    await message.reply_text(
-        f"👋 Hi {user.first_name}!\n\n"
-        f"🤖 **Please use the buttons below to navigate:**\n\n"
-        f"🎲 **Random Files** - Get 5 random media files instantly\n"
-        f"💎 **Premium Plans** - Unlimited access without ads\n\n"
-        f"💡 **Use either keyboard or inline buttons!**",
-        reply_markup=custom_keyboard
-    )
+        await message.reply_text(
+            f"👋 Hi {user.first_name}!\n\n"
+            f"❓ **I didn't understand that message.**\n\n"
+            f"🤖 **Please use the buttons below or send /start command:**\n\n"
+            f"🎲 **Random Files** - Get 5 random media files instantly\n"
+            f"💎 **Premium Plans** - Unlimited access without ads\n\n"
+            f"💡 **Tip:** Send /start to see all available options!",
+            reply_markup=custom_keyboard
+        )
 
-    # Send inline buttons as alternative option
-    await message.reply_text(
-        "🚀 **Or use these quick buttons:**",
-        reply_markup=inline_buttons
-    )
+        # Send inline buttons as alternative option
+        await message.reply_text(
+            "🚀 **Quick Navigation:**",
+            reply_markup=inline_buttons
+        )
+
+    except Exception as e:
+        print(f"ERROR in handle_useless_messages: {e}")
+        try:
+            await message.reply_text(
+                "❌ **Something went wrong!**\n\n"
+                "🔄 Please send /start command to restart the bot properly.",
+                reply_markup=InlineKeyboardMarkup([
+                    [InlineKeyboardButton("🔄 Restart Bot", url=f"https://t.me/{client.username}?start=")]
+                ])
+            )
+        except:
+            pass
