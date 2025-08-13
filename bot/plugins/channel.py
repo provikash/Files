@@ -54,7 +54,7 @@ async def auto_index_files(client: Client, message: Message):
             file_name = message.document.file_name
 
     try:
-        # Use unique message ID combining channel and message ID
+        # Use consistent file ID format
         unique_file_id = f"{client.db_channel.id}_{post_message.id}"
 
         # Add to search index
@@ -149,7 +149,15 @@ async def auto_index_media(client: Client, message: Message):
                     file_name = message.document.file_name
 
             # Use unique message ID for indexing
-            unique_file_id = f"{Config.INDEX_CHANNEL_ID}_{message.id}"  # Add to index
+            unique_file_id = f"{Config.INDEX_CHANNEL_ID}_{message.id}"
+
+            # Check for existing file before adding
+            from bot.database.index_db import collection
+            existing_file = await collection.find_one({"_id": unique_file_id})
+            if existing_file:
+                print(f"⚠️ File {unique_file_id} already exists in index, skipping")
+                return
+
             await add_to_index(
                 file_id=unique_file_id,
                 file_name=file_name,
@@ -162,6 +170,7 @@ async def auto_index_media(client: Client, message: Message):
             print(f"✅ Auto-indexed {media_type} file {message.id} from indexing channel")
 
         except Exception as e:
+            logger.exception(f"❌ Error auto-indexing from indexing channel: {e}")
             print(f"❌ Error auto-indexing from indexing channel: {e}")
 
 # Temporary storage for indexing state
@@ -236,7 +245,7 @@ async def handle_forwarded_files(client: Client, message: Message):
 @Client.on_callback_query(filters.regex(r"^(start_index|cancel_index)"))
 async def handle_index_callback(client: Client, query):
     """Handle indexing confirmation callbacks"""
-    
+
     # Security check: Only admins can perform indexing
     if query.from_user.id not in Config.ADMINS:
         return await query.answer("❌ Unauthorized access!", show_alert=True)
@@ -328,7 +337,7 @@ async def index_channel_files(client: Client, message: Message, channel_id: int)
     try:
         # Get channel info
         channel = await client.get_chat(channel_id)
-        
+
         # Start indexing from latest messages
         current = 0
         async for msg in client.get_chat_history(channel_id):
@@ -430,164 +439,6 @@ async def index_channel_files(client: Client, message: Message, channel_id: int)
             f"• Errors: {errors}"
         )
 
-    except Excepta = 0
-    unsupported = 0
-    message_count = 0
-    processed_files = set()
-
-    try:
-        # Get channel info
-        channel = await client.get_chat(channel_id)
-        channel_title = channel.title or "Unknown Channel"
-
-        status_msg = await message.edit_text(
-            f"📊 **Indexing Progress for {channel_title}**\n\n"
-            f"🔍 Scanning messages...\n"
-            f"📁 Files indexed: {total_files}\n"
-            f"⚠️ Duplicates skipped: {duplicate_files}\n"
-            f"❌ Errors: {errors}"
-        )
-
-        temp.CANCEL = False
-
-        # Use get_messages with batch processing for bot compatibility
-        current_id = temp.CURRENT
-        batch_size = 50  # Reduced from 100 to prevent rate limiting
-
-        while not temp.CANCEL:
-            try:
-                # Add delay between batches to prevent rate limiting
-                if current_id > temp.CURRENT:
-                    await asyncio.sleep(1)  # 1 second delay between batches
-                
-                # Get a batch of messages starting from current_id
-                message_ids = list(range(current_id + 1, current_id + batch_size + 1))
-                messages = await client.get_messages(channel_id, message_ids=message_ids)
-
-                # If no messages returned, we've reached the end
-                if not messages or all(msg is None for msg in messages):
-                    break
-
-                for msg in messages:
-                    if temp.CANCEL:
-                        await status_msg.edit_text(
-                            f"⚠️ **Indexing Cancelled for {channel_title}**\n\n"
-                            f"🔍 Messages scanned: {message_count}\n"
-                            f"📁 Files indexed: {total_files}\n"
-                            f"⚠️ Duplicates skipped: {duplicate_files}\n"
-                            f"❌ Errors: {errors}"
-                        )
-                        break
-
-                    # Skip None messages (deleted or not found)
-                    if msg is None:
-                        deleted += 1
-                        continue
-
-                    message_count += 1
-
-                    # Update progress every 200 messages to reduce API calls
-                    if message_count % 200 == 0:
-                        await status_msg.edit_text(
-                            f"📊 **Indexing Progress for {channel_title}**\n\n"
-                            f"🔍 Messages scanned: {message_count}\n"
-                            f"📁 Files indexed: {total_files}\n"
-                            f"⚠️ Duplicates skipped: {duplicate_files}\n"
-                            f"❌ Errors: {errors}"
-                        )
-
-
-                    # Skip if message has no media
-                    if not msg.media:
-                        no_media += 1
-                        continue
-
-                    # Only process videos, documents, and photos (skip audio, stickers, etc.)
-                    if msg.media not in [enums.MessageMediaType.VIDEO, enums.MessageMediaType.DOCUMENT, enums.MessageMediaType.PHOTO]:
-                        unsupported += 1
-                        continue
-
-                    # Use Telegram's unique message ID as the file identifier
-                    # Each message has a unique ID within a channel
-                    unique_file_id = f"{channel_id}_{msg.id}"
-
-                    if unique_file_id in processed_files:
-                        duplicate_files += 1
-                        continue
-
-                    try:
-                        # Check if file already exists in database using unique message ID
-                        from bot.database.index_db import collection
-                        existing_file = await collection.find_one({"_id": unique_file_id})
-                        if existing_file:
-                            duplicate_files += 1
-                            processed_files.add(unique_file_id)
-                            continue
-
-                        # Extract file information
-                        media_type = "unknown"
-                        file_size = 0
-                        file_name = msg.caption or f"File_{msg.id}"
-
-                        if msg.video:
-                            media_type = "video"
-                            file_size = msg.video.file_size or 0
-                            if msg.video.file_name:
-                                file_name = msg.video.file_name
-                        elif msg.photo:
-                            media_type = "photo"
-                            file_size = getattr(msg.photo, 'file_size', 0)
-                        elif msg.document:
-                            # Skip compressed files
-                            if msg.document.file_name:
-                                file_ext = msg.document.file_name.lower().split('.')[-1]
-                                if file_ext in ['zip', 'rar', '7z', 'tar', 'gz', 'bz2']:
-                                    continue
-                            media_type = "document"
-                            file_size = msg.document.file_size or 0
-                            if msg.document.file_name:
-                                file_name = msg.document.file_name
-
-                        # Add to index using unique message ID
-                        await add_to_index(
-                            file_id=unique_file_id,
-                            file_name=file_name,
-                            file_type=media_type,
-                            file_size=file_size,
-                            caption=msg.caption or '',
-                            user_id=msg.from_user.id if msg.from_user else 0
-                        )
-
-                        total_files += 1
-                        processed_files.add(unique_file_id)
-
-                    except Exception as e:
-                        logger.exception(f"Error indexing file {msg.id}: {e}")
-                        errors += 1
-
-                # Update current_id for the next batch
-                current_id += batch_size
-
-            except Exception as e:
-                logger.exception(f"Error during batch processing: {e}")
-                errors += 1
-                break
-
-
-        # Final status update
-        await status_msg.edit_text(
-            f"✅ **Indexing Complete for {channel_title}**\n\n"
-            f"🔍 Total messages scanned: {message_count}\n"
-            f"📁 Files successfully indexed: {total_files}\n"
-            f"⚠️ Duplicate files skipped: {duplicate_files}\n"
-            f"🗑️ Deleted messages skipped: {deleted}\n"
-            f"📄 Non-media messages skipped: {no_media + unsupported}\n"
-            f"❌ Errors encountered: {errors}\n\n"
-            f"All media files from the channel have been indexed!"
-        )
-
-        logger.info(f"✅ Completed indexing channel {channel_title}: {total_files} files indexed")
-
     except Exception as e:
         logger.exception(f"Error during channel indexing: {e}")
         await message.edit_text(f"❌ Error during indexing: {str(e)}")
@@ -601,7 +452,7 @@ async def cancel_indexing(client: Client, query):
 @Client.on_message(filters.channel & filters.incoming & filters.chat(Config.CHANNEL_ID))
 async def new_post(client: Client, message: Message):
     """Handle new posts in the main storage channel"""
-    
+
     # Auto-index media files from the main storage channel
     if message.video or message.document or message.photo or message.audio:
         try:
@@ -646,7 +497,7 @@ async def new_post(client: Client, message: Message):
 
         except Exception as e:
             print(f"❌ Error auto-indexing from main channel: {e}")
-    
+
     # Add share button if not disabled
     if not Config.DISABLE_CHANNEL_BUTTON:
         converted_id = message.id * abs(client.db_channel.id)
