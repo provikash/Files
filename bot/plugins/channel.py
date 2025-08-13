@@ -197,7 +197,6 @@ async def handle_forwarded_files(client: Client, message: Message):
         return
 
     if message.forward_from_chat.type != enums.ChatType.CHANNEL:
-        return != enums.ChatType.CHANNEL:
         return
 
     forward_chat = message.forward_from_chat
