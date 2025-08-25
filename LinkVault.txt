@@ -1382,3 +1382,10 @@ Traceback (most recent call last):
   File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/errors/rpc_error.py", line 93, in raise_it
     raise getattr(
 pyrogram.errors.exceptions.bad_request_400.BotMethodInvalid: Telegram says: [400 BOT_METHOD_INVALID] (caused by "messages.GetHistory") Pyrogram 2.3.45 thinks: The method can't be used by bots
+[25-Aug-25 15:01:30 - INFO] - root - Stop signal received (SIGTERM). Exiting...
+[25-Aug-25 15:01:30 - INFO] - bot - Bot stopped.
+[25-Aug-25 15:01:36 - INFO] - bot - Bot Running..!
+
+Created by 
+https://t.me/ps_updates
+[25-Aug-25 15:01:36 - INFO] - apscheduler.scheduler - Scheduler started
