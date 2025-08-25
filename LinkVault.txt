@@ -1328,3 +1328,16 @@ https://t.me/ps_updates
 Created by 
 https://t.me/ps_updates
 [25-Aug-25 14:52:04 - INFO] - apscheduler.scheduler - Scheduler started
+[25-Aug-25 14:55:09 - INFO] - root - Stop signal received (SIGTERM). Exiting...
+[25-Aug-25 14:55:09 - INFO] - bot - Bot stopped.
+[25-Aug-25 14:55:14 - INFO] - bot - Bot Running..!
+
+Created by 
+https://t.me/ps_updates
+[25-Aug-25 14:55:14 - INFO] - apscheduler.scheduler - Scheduler started
+[25-Aug-25 14:55:22 - ERROR] - bot.plugins.index - 'Bot' object has no attribute 'iter_messages'
+Traceback (most recent call last):
+  File "/home/runner/workspace/bot/plugins/index.py", line 208, in index_files_to_db
+    async for message in bot.iter_messages(chat, lst_msg_id, temp.CURRENT):
+                         ^^^^^^^^^^^^^^^^^
+AttributeError: 'Bot' object has no attribute 'iter_messages'. Did you mean: 'get_messages'?
