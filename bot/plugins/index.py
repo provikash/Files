@@ -137,6 +137,33 @@ async def send_for_index(bot, message):
     
     await message.reply('Thank you for the contribution! Wait for moderators to verify the files.')
 
+@Client.on_message(filters.command('index') & filters.private & filters.user(Config.ADMINS))
+async def index_command(bot, message):
+    """Index command handler - provides instructions on how to index"""
+    help_text = """
+📋 **Channel Indexing Instructions**
+
+To index a channel, you can:
+
+1️⃣ **Forward a message** from the channel you want to index
+2️⃣ **Send a Telegram link** in this format:
+   `https://t.me/channel_username/message_id`
+   or
+   `https://t.me/c/channel_id/message_id`
+
+3️⃣ Use `/setskip <number>` to set how many messages to skip from the latest
+
+**Example:**
+Forward any message from @your_channel or send:
+`https://t.me/your_channel/1234`
+
+The bot will then ask for confirmation and start indexing all files from that channel.
+
+**Current Skip Number:** {skip}
+    """.format(skip=temp.CURRENT)
+    
+    await message.reply_text(help_text)
+
 @Client.on_message(filters.command('setskip') & filters.private & filters.user(Config.ADMINS))
 async def set_skip_number(bot, message):
     """Set skip number for indexing"""
