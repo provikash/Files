@@ -63,8 +63,11 @@ async def index_files(bot, query):
     
     await index_files_to_db(int(lst_msg_id), chat, msg, bot)
 
-@Client.on_message((filters.forwarded | (filters.regex(r"(https://)?(t\.me/|telegram\.me/|telegram\.dog/)(c/)?(\d+|[a-zA-Z_0-9]+)/(\d+)$")) & filters.text) & filters.private & filters.incoming & filters.user(Config.ADMINS))
+@Client.on_message((filters.forwarded | (filters.regex(r"(https://)?(t\.me/|telegram\.me/|telegram\.dog/)(c/)?(\d+|[a-zA-Z_0-9]+)/(\d+)$")) & filters.text) & filters.private & filters.incoming)
 async def send_for_index(bot, message):
+    # Check if user is admin
+    if message.from_user.id not in Config.ADMINS and message.from_user.id != Config.OWNER_ID:
+        return await message.reply_text("❌ This command is only available to administrators.")
     if message.text:
         regex = re.compile(r"(https://)?(t\.me/|telegram\.me/|telegram\.dog/)(c/)?(\d+|[a-zA-Z_0-9]+)/(\d+)$")
         match = regex.match(message.text)
@@ -137,8 +140,11 @@ async def send_for_index(bot, message):
     
     await message.reply('Thank you for the contribution! Wait for moderators to verify the files.')
 
-@Client.on_message(filters.command('index') & filters.private & filters.user(Config.ADMINS))
+@Client.on_message(filters.command('index') & filters.private)
 async def index_command(bot, message):
+    # Check if user is admin
+    if message.from_user.id not in Config.ADMINS and message.from_user.id != Config.OWNER_ID:
+        return await message.reply_text("❌ This command is only available to administrators.")
     """Index command handler - provides instructions on how to index"""
     help_text = """
 📋 **Channel Indexing Instructions**
@@ -164,8 +170,11 @@ The bot will then ask for confirmation and start indexing all files from that ch
     
     await message.reply_text(help_text)
 
-@Client.on_message(filters.command('setskip') & filters.private & filters.user(Config.ADMINS))
+@Client.on_message(filters.command('setskip') & filters.private)
 async def set_skip_number(bot, message):
+    # Check if user is admin
+    if message.from_user.id not in Config.ADMINS and message.from_user.id != Config.OWNER_ID:
+        return await message.reply_text("❌ This command is only available to administrators.")
     """Set skip number for indexing"""
     if len(message.command) < 2:
         return await message.reply_text("❌ Usage: `/setskip <number>`\nExample: `/setskip 100`")
