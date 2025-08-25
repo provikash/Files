@@ -1354,3 +1354,31 @@ Traceback (most recent call last):
     async for message in bot.iter_history(chat, offset_id=lst_msg_id, offset=temp.CURRENT):
                          ^^^^^^^^^^^^^^^^
 AttributeError: 'Bot' object has no attribute 'iter_history'
+[25-Aug-25 14:57:49 - INFO] - root - Stop signal received (SIGTERM). Exiting...
+[25-Aug-25 14:57:49 - INFO] - bot - Bot stopped.
+[25-Aug-25 14:57:54 - INFO] - bot - Bot Running..!
+
+Created by 
+https://t.me/ps_updates
+[25-Aug-25 14:57:54 - INFO] - apscheduler.scheduler - Scheduler started
+[25-Aug-25 14:58:05 - ERROR] - bot.plugins.index - Telegram says: [400 BOT_METHOD_INVALID] (caused by "messages.GetHistory") Pyrogram 2.3.45 thinks: The method can't be used by bots
+Traceback (most recent call last):
+  File "/home/runner/workspace/bot/plugins/index.py", line 208, in index_files_to_db
+    async for message in bot.get_chat_history(chat, offset_id=lst_msg_id, offset=temp.CURRENT):
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/methods/messages/get_chat_history.py", line 113, in get_chat_history
+    messages = await get_chunk(
+               ^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/methods/messages/get_chat_history.py", line 38, in get_chunk
+    messages = await client.invoke(
+               ^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/methods/advanced/invoke.py", line 80, in invoke
+    r = await self.session.invoke(
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/session/session.py", line 420, in invoke
+    return await self.send(query, timeout=timeout)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/session/session.py", line 377, in send
+    RPCError.raise_it(result, type(data))
+  File "/home/runner/workspace/.pythonlibs/lib/python3.12/site-packages/pyrogram/errors/rpc_error.py", line 93, in raise_it
+    raise getattr(
+pyrogram.errors.exceptions.bad_request_400.BotMethodInvalid: Telegram says: [400 BOT_METHOD_INVALID] (caused by "messages.GetHistory") Pyrogram 2.3.45 thinks: The method can't be used by bots
