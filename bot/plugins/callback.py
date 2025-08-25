@@ -531,11 +531,15 @@ async def buy_premium_callback(client, query: CallbackQuery):
         print(f"Error in buy_premium_callback: {e}")
         await query.answer("❌ Error processing request. Please try again.", show_alert=True)
 
-# Error handler for unhandled callbacks
-@Client.on_callback_query()
+# Error handler for unhandled callbacks - using high group number to run last
+@Client.on_callback_query(group=10)
 async def error_callback_handler(client, query: CallbackQuery):
     """Catch-all callback handler for unhandled callbacks with error handling"""
     try:
+        # Skip if this is an index-related callback (let index.py handle it)
+        if query.data.startswith('index'):
+            return
+            
         print(f"DEBUG: Unhandled callback received: '{query.data}' from user {query.from_user.id}")
 
         # Handle unknown callbacks gracefully

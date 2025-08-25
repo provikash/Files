@@ -19,7 +19,7 @@ class IndexTemp:
 
 temp = IndexTemp()
 
-@Client.on_callback_query(filters.regex(r'^index'))
+@Client.on_callback_query(filters.regex(r'^index'), group=0)
 async def index_files(bot, query):
     # Security check: Only admins can perform indexing
     if query.from_user.id not in Config.ADMINS:
