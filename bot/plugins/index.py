@@ -199,71 +199,95 @@ async def index_files_to_db(lst_msg_id, chat, msg, bot):
     deleted = 0
     no_media = 0
     unsupported = 0
+    current = temp.CURRENT
     
     async with lock:
         try:
-            current = temp.CURRENT
             temp.CANCEL = False
             
-            async for message in bot.get_chat_history(chat, offset_id=lst_msg_id, offset=temp.CURRENT):
-                if temp.CANCEL:
-                    await msg.edit(f"Successfully Cancelled!\n\n"
-                                   f"Saved <code>{total_files}</code> files to database!\n"
-                                   f"Duplicate Files Skipped: <code>{duplicate}</code>\n"
-                                   f"Deleted Messages Skipped: <code>{deleted}</code>\n"
-                                   f"Non-Media messages skipped: <code>{no_media + unsupported}</code>\n"
-                                   f"Errors Occurred: <code>{errors}</code>")
-                    break
-                
-                current += 1
-                
-                if current % 80 == 0:
-                    can = [[InlineKeyboardButton('Cancel', callback_data='index_cancel')]]
-                    reply = InlineKeyboardMarkup(can)
-                    await msg.edit_text(
-                        text=f"Total messages fetched: <code>{current}</code>\n"
-                             f"Total messages saved: <code>{total_files}</code>\n"
-                             f"Duplicate Files Skipped: <code>{duplicate}</code>\n"
-                             f"Deleted Messages Skipped: <code>{deleted}</code>\n"
-                             f"Non-Media messages skipped: <code>{no_media + unsupported}</code>\n"
-                             f"Errors Occurred: <code>{errors}</code>",
-                        reply_markup=reply)
-                
-                if message.empty:
-                    deleted += 1
-                    continue
-                elif not message.media:
-                    no_media += 1
-                    continue
-                elif message.media not in [enums.MessageMediaType.VIDEO, enums.MessageMediaType.AUDIO, enums.MessageMediaType.DOCUMENT]:
-                    unsupported += 1
-                    continue
-                
-                media = getattr(message, message.media.value, None)
-                if not media:
-                    unsupported += 1
-                    continue
-                
-                # Extract file information
-                file_name = getattr(media, 'file_name', None) or message.caption or f"File_{message.id}"
-                file_size = getattr(media, 'file_size', 0)
-                file_type = message.media.value
-                caption = message.caption or ''
-                
+            # Start from the latest message and work backwards
+            # We'll get messages in batches using get_messages
+            while not temp.CANCEL:
                 try:
-                    # Add to our index database
-                    await add_to_index(
-                        file_id=str(message.id),
-                        file_name=file_name,
-                        file_type=file_type,
-                        file_size=file_size,
-                        caption=caption,
-                        user_id=message.from_user.id if message.from_user else 0
-                    )
-                    total_files += 1
+                    # Calculate the message ID to fetch
+                    fetch_msg_id = lst_msg_id - current
+                    
+                    if fetch_msg_id <= 0:
+                        break
+                    
+                    # Try to get the message
+                    try:
+                        message = await bot.get_messages(chat, fetch_msg_id)
+                    except:
+                        current += 1
+                        deleted += 1
+                        continue
+                    
+                    if not message or message.empty:
+                        current += 1
+                        deleted += 1
+                        continue
+                    
+                    current += 1
+                    
+                    # Update status every 20 messages
+                    if current % 20 == 0:
+                        can = [[InlineKeyboardButton('Cancel', callback_data='index_cancel')]]
+                        reply = InlineKeyboardMarkup(can)
+                        await msg.edit_text(
+                            text=f"Total messages fetched: <code>{current}</code>\n"
+                                 f"Total messages saved: <code>{total_files}</code>\n"
+                                 f"Duplicate Files Skipped: <code>{duplicate}</code>\n"
+                                 f"Deleted Messages Skipped: <code>{deleted}</code>\n"
+                                 f"Non-Media messages skipped: <code>{no_media + unsupported}</code>\n"
+                                 f"Errors Occurred: <code>{errors}</code>",
+                            reply_markup=reply)
+                    
+                    # Check if message has media
+                    if not message.media:
+                        no_media += 1
+                        continue
+                    elif message.media not in [enums.MessageMediaType.VIDEO, enums.MessageMediaType.AUDIO, enums.MessageMediaType.DOCUMENT]:
+                        unsupported += 1
+                        continue
+                    
+                    media = getattr(message, message.media.value, None)
+                    if not media:
+                        unsupported += 1
+                        continue
+                    
+                    # Extract file information
+                    file_name = getattr(media, 'file_name', None) or message.caption or f"File_{message.id}"
+                    file_size = getattr(media, 'file_size', 0)
+                    file_type = message.media.value
+                    caption = message.caption or ''
+                    
+                    try:
+                        # Create a unique file ID using chat and message ID
+                        unique_file_id = f"{chat}_{message.id}"
+                        
+                        # Add to our index database
+                        await add_to_index(
+                            file_id=unique_file_id,
+                            file_name=file_name,
+                            file_type=file_type,
+                            file_size=file_size,
+                            caption=caption,
+                            user_id=message.from_user.id if message.from_user else 0
+                        )
+                        total_files += 1
+                    except Exception as e:
+                        logger.exception(f"Error indexing file {message.id}: {e}")
+                        errors += 1
+                        
+                except FloodWait as e:
+                    await asyncio.sleep(e.x)
+                    continue
                 except Exception as e:
-                    logger.exception(f"Error indexing file {message.id}: {e}")
+                    logger.exception(f"Error processing message: {e}")
                     errors += 1
+                    current += 1
+                    continue
                     
         except Exception as e:
             logger.exception(e)
