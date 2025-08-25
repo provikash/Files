@@ -205,7 +205,7 @@ async def index_files_to_db(lst_msg_id, chat, msg, bot):
             current = temp.CURRENT
             temp.CANCEL = False
             
-            async for message in bot.iter_history(chat, offset_id=lst_msg_id, offset=temp.CURRENT):
+            async for message in bot.get_chat_history(chat, offset_id=lst_msg_id, offset=temp.CURRENT):
                 if temp.CANCEL:
                     await msg.edit(f"Successfully Cancelled!\n\n"
                                    f"Saved <code>{total_files}</code> files to database!\n"
